@@ -78,11 +78,13 @@ export function BackupPanel({ onChanged }: { onChanged: () => void }) {
         if (!res.ok || !data.ok) throw new Error(data.error || "M3U içe aktarılamadı");
         setNote(data.summary);
         showToast(data.summary, "success");
+        window.dispatchEvent(new CustomEvent("tg-db-synced"));
       } else {
         // Standard JSON backup
         const res = await importFn({ data: { content, activateStreams: activate } });
         setNote(`Geri yüklendi → ${res.streams} yayın, ${res.seeds} tohum, ${res.layout} şerit.`);
         showToast(`${res.streams} yayın ve ayarlar geri yüklendi.`);
+        window.dispatchEvent(new CustomEvent("tg-db-synced"));
       }
       onChanged();
     } catch (e: any) {
@@ -118,6 +120,7 @@ export function BackupPanel({ onChanged }: { onChanged: () => void }) {
       setShowM3uModal(false);
       setM3uUrl("");
       setM3uText("");
+      window.dispatchEvent(new CustomEvent("tg-db-synced"));
       onChanged();
     } catch (e: any) {
       showToast(e.message || "İçe aktarım başarısız", "error");

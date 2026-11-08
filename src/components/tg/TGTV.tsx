@@ -3,6 +3,7 @@ import Hls from "hls.js";
 import { useServerFn } from "@tanstack/react-start";
 import {
   CalendarClock,
+  Clapperboard,
   Film,
   Laugh,
   Loader2,
@@ -251,6 +252,8 @@ export function TGTVView({ focusedKey, registerRef }: Props) {
   }, [streamUrl, isYouTube, current?.offsetSeconds]);
 
   // Dual-Engine Playback Setup: YouTube API Bridge
+  const ytMountRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!isYouTube || !ytVideoId) return;
     let destroyed = false;
@@ -260,15 +263,24 @@ export function TGTVView({ focusedKey, registerRef }: Props) {
       const YT = (window as any).YT;
       if (!YT || !YT.Player) return;
 
+      const mountEl = ytMountRef.current;
+      if (!mountEl) return;
+
       if (ytPlayerRef.current?.destroy) {
         try {
           ytPlayerRef.current.destroy();
         } catch {}
+        ytPlayerRef.current = null;
       }
+
+      mountEl.innerHTML = "";
+      const targetDiv = document.createElement("div");
+      targetDiv.id = `tgtv-yt-player-target-${Date.now()}`;
+      mountEl.appendChild(targetDiv);
 
       try {
         const startSec = Math.floor(current?.offsetSeconds || 0);
-        ytPlayerRef.current = new YT.Player("tgtv-yt-player-target", {
+        ytPlayerRef.current = new YT.Player(targetDiv, {
           videoId: ytVideoId,
           playerVars: {
             autoplay: 1,
@@ -324,6 +336,10 @@ export function TGTVView({ focusedKey, registerRef }: Props) {
       try {
         ytPlayerRef.current?.destroy?.();
       } catch {}
+      ytPlayerRef.current = null;
+      if (ytMountRef.current) {
+        ytMountRef.current.innerHTML = "";
+      }
     };
   }, [isYouTube, ytVideoId, current?.offsetSeconds, muted]);
 
@@ -360,6 +376,8 @@ export function TGTVView({ focusedKey, registerRef }: Props) {
     switch (id) {
       case "tgtv-sinema":
         return <Film className="h-5 w-5" />;
+      case "tgtv-sinema2":
+        return <Clapperboard className="h-5 w-5" />;
       case "tgtv-yerli":
         return <Sparkles className="h-5 w-5" />;
       case "tgtv-spor":
@@ -389,7 +407,7 @@ export function TGTVView({ focusedKey, registerRef }: Props) {
                 </h2>
               </div>
               <p className="text-xs text-purple-200/70">
-                Otonom akış: Sinema, Türk dizileri, maç özetleri ve TV programları
+                Otonom akış: Sinema, Yabancı Sinema, Türk dizileri, maç özetleri ve TV programları
               </p>
             </div>
           </div>
@@ -405,8 +423,8 @@ export function TGTVView({ focusedKey, registerRef }: Props) {
           </button>
         </div>
 
-        {/* 5 Digiturk-Style Channels Tabs */}
-        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-5">
+        {/* 6 Digiturk-Style Channels Tabs */}
+        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-6">
           {TG_CHANNELS.map((ch) => {
             const isActive = ch.id === activeChannelId;
             const fk = `tgtv-ch-${ch.id}`;
@@ -471,9 +489,8 @@ export function TGTVView({ focusedKey, registerRef }: Props) {
             {isYouTube && ytVideoId ? (
               <div className="absolute inset-0 h-full w-full z-0 bg-black flex items-center justify-center overflow-hidden">
                 <div
-                  key={ytVideoId}
-                  id="tgtv-yt-player-target"
-                  className="pointer-events-none"
+                  ref={ytMountRef}
+                  className="pointer-events-none w-full h-full relative"
                   style={{
                     width: "106%",
                     height: "116%",

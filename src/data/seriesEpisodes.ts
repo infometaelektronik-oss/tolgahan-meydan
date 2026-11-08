@@ -307,6 +307,94 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       airDate: "2022",
     },
   ],
+
+  // Taş Kağıt Makas (Kanal D)
+  "tr-dizi-tas-kagit-makas": [
+    {
+      id: "tkm-1",
+      seriesId: "tr-dizi-tas-kagit-makas",
+      seasonNumber: 1,
+      episodeNumber: 1,
+      title: "1. Bölüm (İlk Bölüm)",
+      description: "Hipertimezi hastası Umut, babasının masumiyetini kanıtlamak için adalet savaşına başlar.",
+      thumbnailUrl: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80",
+      videoUrl: "https://www.youtube.com/watch?v=n6p0ZuSW3Mg",
+      durationMinutes: 130,
+      airDate: "2024",
+    },
+    {
+      id: "tkm-2",
+      seriesId: "tr-dizi-tas-kagit-makas",
+      seasonNumber: 1,
+      episodeNumber: 2,
+      title: "2. Bölüm",
+      description: "Harun Yakar ve Umut'un yolları kesişir, büyük komplo derinleşir.",
+      thumbnailUrl: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80",
+      videoUrl: "https://www.youtube.com/watch?v=n6p0ZuSW3Mg",
+      durationMinutes: 125,
+      airDate: "2024",
+    },
+  ],
+
+  // Yargı (Kanal D - Ay Yapım)
+  "tr-dizi-yargi": [
+    {
+      id: "yargi-1",
+      seriesId: "tr-dizi-yargi",
+      seasonNumber: 1,
+      episodeNumber: 1,
+      title: "1. Bölüm (4K - İlk Bölüm)",
+      description: "Ilgaz Kaya ve Ceylin Erguvan bir cinayet vakasıyla bir araya gelir.",
+      thumbnailUrl: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80",
+      videoUrl: "https://www.youtube.com/watch?v=KqxAM9FNT-I",
+      durationMinutes: 135,
+      airDate: "2021",
+    },
+    {
+      id: "yargi-2",
+      seriesId: "tr-dizi-yargi",
+      seasonNumber: 1,
+      episodeNumber: 2,
+      title: "2. Bölüm",
+      description: "Çınar'ın şüpheli durumu Ilgaz ve Ceylin'i zorlu bir sınavın eşiğine getirir.",
+      thumbnailUrl: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80",
+      videoUrl: "https://www.youtube.com/watch?v=KqxAM9FNT-I",
+      durationMinutes: 130,
+      airDate: "2021",
+    },
+  ],
+
+  // Kızıl Goncalar (NOW TV)
+  "tr-dizi-kizil-goncalar": [
+    {
+      id: "kg-1",
+      seriesId: "tr-dizi-kizil-goncalar",
+      seasonNumber: 1,
+      episodeNumber: 1,
+      title: "1. Bölüm (İlk Bölüm)",
+      description: "Meryem ve kızı Zeynep'in İstanbul'a gelişi ve Levent Alkanlı ile yollarının kesişmesi.",
+      thumbnailUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
+      videoUrl: "https://www.youtube.com/watch?v=kJiPjewTae4",
+      durationMinutes: 135,
+      airDate: "2023",
+    },
+  ],
+
+  // Söz (Star TV - TIMS&B)
+  "tr-dizi-soz": [
+    {
+      id: "soz-1",
+      seriesId: "tr-dizi-soz",
+      seasonNumber: 1,
+      episodeNumber: 1,
+      title: "1. Bölüm: Gözün Arkada Kalmasın",
+      description: "Kıdemli Üsteğmen Yavuz Karasu ve Özel Kuvvetler Timi'nin vatan mücadelesi başlar.",
+      thumbnailUrl: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=600&auto=format&fit=crop&q=80",
+      videoUrl: "https://www.youtube.com/watch?v=lXPn1623C6M",
+      durationMinutes: 125,
+      airDate: "2017",
+    },
+  ],
 };
 
 /**

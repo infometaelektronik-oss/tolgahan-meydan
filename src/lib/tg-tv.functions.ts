@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-export type TGChannelId = "tgtv-hd" | "tgtv-sinema" | "tgtv-yerli" | "tgtv-spor" | "tgtv-eglence";
+export type TGChannelId = "tgtv-hd" | "tgtv-sinema" | "tgtv-sinema2" | "tgtv-yerli" | "tgtv-spor" | "tgtv-eglence";
 
 export interface TGChannelInfo {
   id: TGChannelId;
@@ -18,7 +18,7 @@ export const TG_CHANNELS: TGChannelInfo[] = [
   {
     id: "tgtv-hd",
     name: "TG TV HD",
-    badge: "ÖZEL KUŞAK",
+    badge: "GENEL KUŞAK",
     number: 101,
     description: "TG TV Özel Kuşak: En sevilen Türk filmleri, efsane yerli diziler ve şovlar.",
     genre: "Genel",
@@ -31,15 +31,25 @@ export const TG_CHANNELS: TGChannelInfo[] = [
     badge: "TÜRK SİNEMASI",
     number: 102,
     description: "7/24 Kesintisiz Türk Sineması, Yeşilçam klasikleri ve yerli gişe filmleri.",
-    genre: "Sinema",
+    genre: "Türk Sineması",
     color: "from-amber-600 to-red-600",
     fallbackStreamUrl: "https://www.youtube.com/watch?v=hf2-8MRPGu8",
+  },
+  {
+    id: "tgtv-sinema2",
+    name: "TG TV SİNEMA 2",
+    badge: "YABANCI SİNEMA",
+    number: 103,
+    description: "7/24 Dünya ve Hollywood sineması başyapıtları, kült filmler ve gişe rekortmenleri.",
+    genre: "Yabancı Sinema",
+    color: "from-rose-600 to-red-800",
+    fallbackStreamUrl: "https://www.youtube.com/watch?v=Kb2cGTSMLYo",
   },
   {
     id: "tgtv-yerli",
     name: "TG TV YERLİ",
     badge: "YERLİ DİZİ",
-    number: 103,
+    number: 104,
     description: "Kurtlar Vadisi, Ezel, Çukur, İçerde ve efsane Türk dizileri kuşağı.",
     genre: "Dizi & Nostalji",
     color: "from-blue-600 to-cyan-600",
@@ -49,7 +59,7 @@ export const TG_CHANNELS: TGChannelInfo[] = [
     id: "tgtv-spor",
     name: "TG TV SPOR",
     badge: "EFSANE MAÇLAR",
-    number: 104,
+    number: 105,
     description: "Tarihi maçlar, Galatasaray UEFA Kupası zaferi, efsane derbiler ve yarış özetleri.",
     genre: "Spor",
     color: "from-emerald-600 to-teal-600",
@@ -58,9 +68,9 @@ export const TG_CHANNELS: TGChannelInfo[] = [
   {
     id: "tgtv-eglence",
     name: "TG TV EĞLENCE",
-    badge: "TÜRK ŞOVLARI",
-    number: 105,
-    description: "Güldür Güldür Show, Çok Güzel Hareketler Bunlar ve Beyaz Show nostalji kuşağı.",
+    badge: "TELEVİZYON PROGRAMLARI",
+    number: 106,
+    description: "Güldür Güldür Show, Çok Güzel Hareketler Bunlar, Beyaz Show ve gündüz kuşağı şovları.",
     genre: "Eğlence",
     color: "from-fuchsia-600 to-pink-600",
     fallbackStreamUrl: "https://www.youtube.com/watch?v=2CIzV5lraqk",
@@ -191,6 +201,52 @@ async function ensureChannelSchedule(channelId: TGChannelId): Promise<void> {
         stream_url: "https://www.youtube.com/watch?v=stOXnCPxOws",
         poster_url: officialLogo,
         durationHours: 1.75,
+      },
+    ];
+  } else if (channelId === "tgtv-sinema2") {
+    // 7/24 Yabancı Sinema (World & Hollywood Cinema - strictly movies, no TV channels)
+    pool = [
+      {
+        title: "Interstellar (Yıldızlararası)",
+        description: "Christopher Nolan başyapıtı: İnsanlığın hayatta kalması için solucan deliğinden geçen astronotların destansı yolculuğu.",
+        stream_url: "https://www.youtube.com/watch?v=zSWdZVtXT7E",
+        poster_url: officialLogo,
+        durationHours: 2.75,
+      },
+      {
+        title: "Inception (Başlangıç)",
+        description: "Rüya içinde rüya mimarisi ve bilinçaltı hırsızlığı. Leonardo DiCaprio başrolünde bir sinema klasiği.",
+        stream_url: "https://www.youtube.com/watch?v=YoHD9XEInc0",
+        poster_url: officialLogo,
+        durationHours: 2.5,
+      },
+      {
+        title: "The Dark Knight (Kara Şövalye)",
+        description: "Batman ve Joker'in Gotham sokaklarındaki efsanevi felsefi ve psikolojik mücadelesi.",
+        stream_url: "https://www.youtube.com/watch?v=EXeTwQWrcwY",
+        poster_url: officialLogo,
+        durationHours: 2.5,
+      },
+      {
+        title: "Gladiator (Gladyatör)",
+        description: "General Maximus Decimus Meridius'un Roma İmparatorluğu'na karşı başkaldırışı ve arenalardaki onur savaşı.",
+        stream_url: "https://www.youtube.com/watch?v=owK1qxDselE",
+        poster_url: officialLogo,
+        durationHours: 2.5,
+      },
+      {
+        title: "The Matrix (Matrix)",
+        description: "Gerçek nedir? Neo'nun makinelerin simülasyonundan uyanışı ve insanlığın kurtuluş mücadelesi.",
+        stream_url: "https://www.youtube.com/watch?v=vKQi3bBA1y8",
+        poster_url: officialLogo,
+        durationHours: 2.25,
+      },
+      {
+        title: "The Shawshank Redemption (Esaretin Bedeli)",
+        description: "Andy Dufresne ve Red'in Shawshank hapishanesindeki umut, sabır ve dostluk destanı.",
+        stream_url: "https://www.youtube.com/watch?v=PLl99DlL6b4",
+        poster_url: officialLogo,
+        durationHours: 2.25,
       },
     ];
   } else if (channelId === "tgtv-yerli") {

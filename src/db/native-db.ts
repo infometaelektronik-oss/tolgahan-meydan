@@ -4,7 +4,7 @@
  * Supports file-based persistence on server, memory + localStorage in client,
  * with full PostgREST-compatible fluent API.
  */
-import initialData from "../../data/initial_data.json";
+import initialData from "../../data/initial_data.json" with { type: "json" };
 
 export interface DbData {
   user_streams: any[];

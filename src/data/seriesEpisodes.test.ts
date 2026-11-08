@@ -3,11 +3,12 @@ import assert from "node:assert/strict";
 import { getEpisodesForSeries, SERIES_EPISODES } from "./seriesEpisodes";
 import { TG_CHANNELS } from "../lib/tg-tv.functions";
 
-test("TG TV has all 5 Digiturk-style channels configured", () => {
-  assert.equal(TG_CHANNELS.length, 5);
+test("TG TV has all Digiturk-style channels configured including Sinema 2", () => {
+  assert.ok(TG_CHANNELS.length >= 5);
   const ids = TG_CHANNELS.map((c) => c.id);
   assert.ok(ids.includes("tgtv-hd"));
   assert.ok(ids.includes("tgtv-sinema"));
+  assert.ok(ids.includes("tgtv-sinema2"));
   assert.ok(ids.includes("tgtv-yerli"));
   assert.ok(ids.includes("tgtv-spor"));
   assert.ok(ids.includes("tgtv-eglence"));

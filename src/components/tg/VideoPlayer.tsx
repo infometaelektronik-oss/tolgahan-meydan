@@ -71,6 +71,7 @@ function getYouTubeWatchUrl(url?: string | null): string | null {
 export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const ytPlayerRef = useRef<any>(null);
+  const ytMountRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -216,16 +217,25 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
       const YT = (window as any).YT;
       if (!YT || !YT.Player) return;
 
+      const mountEl = ytMountRef.current;
+      if (!mountEl) return;
+
       try {
         if (ytPlayerRef.current?.destroy) {
           try {
             ytPlayerRef.current.destroy();
           } catch {}
+          ytPlayerRef.current = null;
         }
       } catch {}
 
+      mountEl.innerHTML = "";
+      const targetDiv = document.createElement("div");
+      targetDiv.id = `tg-yt-player-target-${Date.now()}`;
+      mountEl.appendChild(targetDiv);
+
       try {
-        ytPlayerRef.current = new YT.Player("tg-yt-player-target", {
+        ytPlayerRef.current = new YT.Player(targetDiv, {
           videoId: ytVideoId,
           playerVars: {
             autoplay: 1,
@@ -314,6 +324,9 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
         }
       } catch {}
       ytPlayerRef.current = null;
+      if (ytMountRef.current) {
+        ytMountRef.current.innerHTML = "";
+      }
     };
   }, [isYouTube, ytVideoId, retryKey]);
 
@@ -695,8 +708,8 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
           style={{ background: "transparent", filter: remaster ? "contrast(1.12) saturate(1.18) brightness(1.04)" : undefined }}
         >
           <div
-            id="tg-yt-player-target"
-            className="pointer-events-none"
+            ref={ytMountRef}
+            className="pointer-events-none w-full h-full relative"
             style={{
               width: "106%",
               height: "116%",

@@ -17,21 +17,28 @@ const MAIN_CATEGORIES = [
   "Tüm Filmler",
   "Yerli Sinema",
   "Yeşilçam Klasikleri",
+  "Yabancı Sinema",
+] as const;
+
+const FOREIGN_SUBCATEGORIES = [
+  "Tümü",
+  "Aksiyon",
+  "Bilim Kurgu",
+  "Dram & Suç",
+  "Macera",
 ] as const;
 
 export function MovieView({ focusedKey, registerRef, onPick, streams, getEnrichment }: Props) {
   const [mainCat, setMainCat] = useState<(typeof MAIN_CATEGORIES)[number]>("Tüm Filmler");
+  const [foreignSubCat, setForeignSubCat] = useState<(typeof FOREIGN_SUBCATEGORIES)[number]>("Tümü");
 
-  // Get strictly Turkish movies (category === "Movies", no foreign channels, no live TV)
+  // Filter movies: strictly movies (category === "Movies", no TV live streams, no Indian news)
   const movies = useMemo(() => {
     return streams
       .filter((s) => {
         if (s.category !== "Movies") return false;
-        if (s.isForeign) return false;
         if (s.streamType === "HLS") return false;
         if (s.sourceUrl?.includes(".m3u8")) return false;
-        const sub = (s.subCategory || "").toLowerCase();
-        if (sub.includes("yabancı")) return false;
         return true;
       })
       .map(streamToMedia);
@@ -54,22 +61,47 @@ export function MovieView({ focusedKey, registerRef, onPick, streams, getEnrichm
           hay.includes("yeşilçam") ||
           hay.includes("yesilcam") ||
           /hababam|tosun|süt|şaban|kibar|çöpçü|neşeli|şekerpare|selvi boylum|kapıcılar/i.test(titleLower) ||
-          (m.year && m.year < 1990)
+          (m.year && m.year < 1990 && !m.isForeign)
         );
       });
     }
 
     if (mainCat === "Yerli Sinema") {
       return movies.filter((m) => {
+        if (m.isForeign) return false;
+        const sub = (m.subCategory || "").toLowerCase();
+        if (sub.includes("yabancı")) return false;
         const titleLower = m.title.toLowerCase();
         const isYesilcam =
-          /hababam|tosun|süt|şaban|kibar|çöpçü|neşeli|şekerpare|selvi boylum|kapıcılar/i.test(titleLower);
+          /hababam|tosun|süt|şaban|kibar|çöpçü|neşeli|şekerpare|selvi boylum|kapıcılar/i.test(titleLower) ||
+          (m.year && m.year < 1990);
         return !isYesilcam;
       });
     }
 
+    if (mainCat === "Yabancı Sinema") {
+      const foreignList = movies.filter((m) => {
+        if (m.isForeign) return true;
+        const sub = (m.subCategory || "").toLowerCase();
+        if (sub.includes("yabancı")) return true;
+        // Check Hollywood classics by title
+        return /interstellar|inception|dark knight|gladiator|matrix|shawshank|godfather|pulp fiction|fight club/i.test(m.title);
+      });
+
+      if (foreignSubCat === "Tümü") return foreignList;
+
+      return foreignList.filter((m) => {
+        const text = [m.title, m.genre || "", ...(m.genres || []), m.description || ""].join(" ").toLowerCase();
+        if (foreignSubCat === "Aksiyon") return /aksiyon|action|knight|matrix|gladiator/i.test(text);
+        if (foreignSubCat === "Bilim Kurgu") return /bilim|kurgu|sci-fi|uzay|interstellar|inception|matrix/i.test(text);
+        if (foreignSubCat === "Dram & Suç") return /dram|suç|crime|drama|shawshank|godfather/i.test(text);
+        if (foreignSubCat === "Macera") return /macera|adventure|yolculuk|gladiator/i.test(text);
+        return true;
+      });
+    }
+
     return movies;
-  }, [movies, mainCat]);
+  }, [movies, mainCat, foreignSubCat]);
 
   let cardCounter = 0;
 
@@ -115,6 +147,29 @@ export function MovieView({ focusedKey, registerRef, onPick, streams, getEnrichm
             );
           })}
         </div>
+
+        {/* Foreign Cinema Subcategories */}
+        {mainCat === "Yabancı Sinema" && (
+          <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-white/10 pt-4">
+            <span className="text-xs font-semibold text-white/50 mr-1">Türler:</span>
+            {FOREIGN_SUBCATEGORIES.map((sub) => {
+              const active = foreignSubCat === sub;
+              return (
+                <button
+                  key={sub}
+                  onClick={() => setForeignSubCat(sub)}
+                  className={`rounded-lg px-3 py-1 text-xs font-medium transition ${
+                    active
+                      ? "bg-rose-600 text-white font-bold shadow-md shadow-rose-900/40"
+                      : "bg-white/5 text-white/60 hover:bg-white/10 hover:text-white border border-white/5"
+                  }`}
+                >
+                  {sub}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Movies Grid */}
