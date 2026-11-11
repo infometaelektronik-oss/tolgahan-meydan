@@ -96,9 +96,33 @@ export function SearchView({
   useEffect(() => () => recRef.current?.stop(), []);
 
   return (
-    <div>
+    <div className="space-y-6 pb-12">
+      {/* VIP Cyber Search Banner Bar (High legibility, large fonts, themed styling) */}
+      <div className="rounded-3xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950/70 via-teal-950/50 to-black p-6 shadow-2xl backdrop-blur-xl">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-[0_0_20px_rgba(52,211,153,0.6)] shrink-0">
+              <Search className="h-6 w-6 text-black" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2.5">
+                <h1 className="text-xl font-black text-white sm:text-2xl md:text-3xl tracking-tight">
+                  Akıllı İçerik Arama Motoru
+                </h1>
+                <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-black uppercase tracking-wider text-emerald-300 border border-emerald-500/40">
+                  {results.length} Sonuç
+                </span>
+              </div>
+              <p className="mt-1 text-xs text-white/70 sm:text-sm">
+                Tüm yerli diziler, filmler, canlı kanallar ve radyo istasyonları arasında anında veya sesli arama yapın.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Search bar with mic */}
-      <div className="mb-6 flex items-center gap-4">
+      <div className="flex items-center gap-4">
         <div
           className={`flex flex-1 items-center gap-3 rounded-2xl border-2 px-5 py-4 backdrop-blur transition ${
             focusedKey === "search-input"

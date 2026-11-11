@@ -13,11 +13,27 @@ type Props = {
 };
 
 export function RadioView({ focusedKey, registerRef, onPick, streams }: Props) {
-  const radios = useMemo(() => streams.filter((s) => s.category === "Radio"), [streams]);
+  const allRadios = useMemo(() => streams.filter((s) => s.category === "Radio"), [streams]);
+  const [tab, setTab] = useState<"all" | "local" | "foreign">("local");
   const [nowPlaying, setNowPlaying] = useState<UserStream | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [paused, setPaused] = useState(false);
   const [muted, setMuted] = useState(false);
+
+  const radios = useMemo(() => {
+    return allRadios.filter((r) => {
+      const isTurkish = !r.isForeign && (r.country === "Türkiye" || (r.subCategory || "").includes("Yerli") || /türk|power|kral|alem|süper|slow|trt|best/i.test(r.title));
+      if (tab === "local") return isTurkish;
+      if (tab === "foreign") return !isTurkish;
+      return true;
+    }).sort((a, b) => {
+      const aTr = !a.isForeign && (a.country === "Türkiye" || /türk|power|kral|alem|süper|slow|trt|best/i.test(a.title));
+      const bTr = !b.isForeign && (b.country === "Türkiye" || /türk|power|kral|alem|süper|slow|trt|best/i.test(b.title));
+      if (aTr && !bTr) return -1;
+      if (!aTr && bTr) return 1;
+      return (a.sortOrder || 999) - (b.sortOrder || 999);
+    });
+  }, [allRadios, tab]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -38,17 +54,49 @@ export function RadioView({ focusedKey, registerRef, onPick, streams }: Props) {
 
   return (
     <div className="space-y-8 pb-10">
-      <div className="rounded-3xl border border-purple-500/30 bg-gradient-to-r from-purple-600/20 via-fuchsia-600/10 to-transparent p-6">
-        <div className="flex items-center gap-3">
-          <Radio className="h-6 w-6 text-purple-200" />
-          <h2 className="text-2xl font-black">Radyo</h2>
-          <span className="rounded-full bg-purple-500/40 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white">
-            {radios.length} istasyon
-          </span>
+      {/* VIP Cyber Radio Banner Bar (High legibility, large fonts, themed styling) */}
+      <div className="rounded-3xl border border-amber-500/30 bg-gradient-to-r from-amber-950/70 via-purple-950/50 to-black p-6 shadow-2xl backdrop-blur-xl">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-[0_0_20px_rgba(251,191,36,0.6)] shrink-0">
+              <Radio className="h-6 w-6 text-black" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2.5">
+                <h1 className="text-xl font-black text-white sm:text-2xl md:text-3xl tracking-tight">
+                  {tab === "local" ? "Türk Ulusal Radyoları" : tab === "foreign" ? "Yabancı Dünya Radyoları" : "Tüm Radyo İstasyonları"}
+                </h1>
+                <span className="rounded-full bg-amber-500/20 px-3 py-1 text-xs font-black uppercase tracking-wider text-amber-300 border border-amber-500/40">
+                  {radios.length} İstasyon
+                </span>
+              </div>
+              <p className="mt-1 text-xs text-white/70 sm:text-sm">
+                Kesintisiz canlı müzik, haber ve sohbet yayınları. Türkiye'nin ve dünyanın en popüler radyo frekansları.
+              </p>
+            </div>
+          </div>
         </div>
-        <p className="mt-2 text-sm text-white/70">
-          M3U yüklediğinde radyo (group-title veya ses URL’si) tespit edilen kaynaklar burada listelenir.
-        </p>
+
+        {/* Yerli vs Yabancı Tabs */}
+        <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-white/10 pt-4">
+          {[
+            { id: "local", label: "Yerli Radyolar" },
+            { id: "foreign", label: "Yabancı Radyolar" },
+            { id: "all", label: "Tümü" },
+          ].map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id as any)}
+              className={`rounded-full px-4 py-2 text-xs font-black uppercase tracking-widest outline-none transition ${
+                tab === t.id
+                  ? "bg-white text-black font-black shadow-lg"
+                  : "bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {radios.length === 0 ? (

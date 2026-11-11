@@ -18,6 +18,7 @@ import { RadioView } from "@/components/tg/RadioView";
 import { TGTVView } from "@/components/tg/TGTV";
 import { SeriesView } from "@/components/tg/SeriesView";
 import { MovieView } from "@/components/tg/MovieView";
+import { PlatformHubs, type PlatformId } from "@/components/tg/PlatformHubs";
 import { getHomeLayout, type HomeRowWithItems } from "@/lib/home-layout.functions";
 
 
@@ -49,6 +50,13 @@ function TGApp() {
   const { streams } = useAllStreams();
   const [homeRows, setHomeRows] = useState<HomeRowWithItems[]>([]);
   const [homeLoaded, setHomeLoaded] = useState(false);
+  const [platformOrigin, setPlatformOrigin] = useState<"all" | "local" | "foreign" | "platform">("all");
+
+  const handleSelectPlatform = (platformId: PlatformId) => {
+    void platformId;
+    setPlatformOrigin("platform");
+    setActiveNav(4);
+  };
 
   useEffect(() => {
     getHomeLayout()
@@ -58,7 +66,10 @@ function TGApp() {
   }, []);
 
   // Admin paneli sidebar'dan kaldırıldı — sadece gizli URL /tgdizifilm-admin-paneli
-  const safeSetActiveNav = useCallback((idx: number) => setActiveNav(idx), []);
+  const safeSetActiveNav = useCallback((idx: number) => {
+    if (idx !== 4) setPlatformOrigin("all");
+    setActiveNav(idx);
+  }, []);
 
 
 
@@ -237,24 +248,15 @@ function TGApp() {
       <main className="relative flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide">
         <div className="pointer-events-none absolute -top-40 left-1/2 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-purple-700/20 blur-[180px]" />
 
-        <div className="relative z-10 px-4 pb-28 pt-16 sm:px-6 md:px-10 md:pb-20 md:pt-8">
-          {/* Top bar */}
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-3 md:mb-8">
-            <div>
-              <div className="font-orbitron text-[10px] font-semibold uppercase tracking-[0.4em] text-purple-300/80 md:text-xs">
-                TG. Dizi Film
-              </div>
-              {activeNav !== 0 && (
-                <h1 className="mt-1 font-orbitron text-2xl font-black md:text-3xl">{headerTitle}</h1>
-              )}
-            </div>
+        <div className="relative z-10 px-4 pb-28 pt-8 sm:px-6 md:px-10 md:pb-20">
+          {/* Top bar: All redundant small category texts removed per user specification */}
+          <div className="mb-4 flex items-center justify-end">
             <div className="flex items-center gap-3">
               <NotificationBell />
             </div>
           </div>
 
-
-          {/* === ANA SAYFA: tamamen admin panelindeki "Ana Sayfa" sekmesinden yönetilir === */}
+          {/* === ANA SAYFA === */}
           {activeNav === 0 && (() => {
             const hero = homeRows.find((r) => r.kind === "hero" && r.items.length > 0);
             const rows = homeRows.filter((r) => r.kind === "row");
@@ -262,6 +264,11 @@ function TGApp() {
             return (
               <>
                 {hero && <HeroSlider items={hero.items.map(streamToMedia)} onPlay={playMedia} />}
+                <PlatformHubs
+                  focusedKey={focusedKey}
+                  registerRef={registerRef}
+                  onSelectPlatform={handleSelectPlatform}
+                />
                 <HomeRows rows={rows} focusedKey={focusedKey} registerRef={registerRef} onPlay={playMedia} />
                 {homeLoaded && !hasAny && (
                   <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-12 text-center text-white/60">
@@ -272,7 +279,7 @@ function TGApp() {
             );
           })()}
 
-          {/* === DİZİLER: Ulusal Kanal ve Kategori Hiyerarşili === */}
+          {/* === DİZİLER: Yerli & Yabancı ve Platform Ayrıştırmalı === */}
           {activeNav === 4 && (
             <SeriesView
               focusedKey={focusedKey}
@@ -280,6 +287,7 @@ function TGApp() {
               onPick={playMedia}
               streams={streams}
               getEnrichment={getEnrichment}
+              initialOrigin={platformOrigin}
             />
           )}
 
@@ -302,10 +310,19 @@ function TGApp() {
             <RadioView focusedKey={focusedKey} registerRef={registerRef} onPick={playMedia} streams={streams} />
           )}
 
-          {activeNav === 3 && <ScheduleView registerRef={registerRef} focusedKey={focusedKey} />}
+          {activeNav === 3 && (
+            <ScheduleView
+              registerRef={registerRef}
+              focusedKey={focusedKey}
+              onPick={playMedia}
+              streams={streams}
+            />
+          )}
 
-          {/* === TG TV === */}
-          {activeNav === 6 && <TGTVView focusedKey={focusedKey} registerRef={registerRef} />}
+          {/* === TG TV (Canlı TV Mantığı: Büyük Neon Kartlar, Tıklandığında Oynatıcı Başlar) === */}
+          {activeNav === 6 && (
+            <TGTVView focusedKey={focusedKey} registerRef={registerRef} onPick={playMedia} />
+          )}
 
           {activeNav === 7 && (
             <SearchView

@@ -32,13 +32,16 @@ export function MovieView({ focusedKey, registerRef, onPick, streams, getEnrichm
   const [mainCat, setMainCat] = useState<(typeof MAIN_CATEGORIES)[number]>("Tüm Filmler");
   const [foreignSubCat, setForeignSubCat] = useState<(typeof FOREIGN_SUBCATEGORIES)[number]>("Tümü");
 
-  // Filter movies: strictly movies (category === "Movies", no TV live streams, no Indian news)
+  // Filter movies: strictly movies (category === "Movies", no TV live streams, no trailers/snippets, no TG TV channel)
   const movies = useMemo(() => {
+    const snippetRe = /fragman|trailer|teaser|\bkesit\b|\bklip\b/i;
     return streams
       .filter((s) => {
         if (s.category !== "Movies") return false;
+        if (s.id === "tgtv-official-channel") return false;
         if (s.streamType === "HLS") return false;
         if (s.sourceUrl?.includes(".m3u8")) return false;
+        if (snippetRe.test(s.title)) return false;
         return true;
       })
       .map(streamToMedia);

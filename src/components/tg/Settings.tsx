@@ -78,9 +78,34 @@ export function SettingsView({
   const key = () => `set-${idx++}`;
 
   return (
-    <div className="grid grid-cols-2 gap-6 pb-10">
-      {/* DISPLAY */}
-      <Section title="Görüntü Ayarları" icon={<Monitor className="h-5 w-5" />}>
+    <div className="space-y-6 pb-12">
+      {/* VIP Cyber Settings Banner Bar (High legibility, large fonts, themed styling) */}
+      <div className="rounded-3xl border border-indigo-500/30 bg-gradient-to-r from-indigo-950/70 via-purple-950/50 to-black p-6 shadow-2xl backdrop-blur-xl">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-[0_0_20px_rgba(99,102,241,0.6)] shrink-0">
+              <Monitor className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2.5">
+                <h1 className="text-xl font-black text-white sm:text-2xl md:text-3xl tracking-tight">
+                  Sistem & Yayın Ayarları
+                </h1>
+                <span className="rounded-full bg-indigo-500/20 px-3 py-1 text-xs font-black uppercase tracking-wider text-indigo-300 border border-indigo-500/40">
+                  4K / HDR10+ / Dolby Atmos
+                </span>
+              </div>
+              <p className="mt-1 text-xs text-white/70 sm:text-sm">
+                Görüntü modu, ses kalibrasyonu, akıllı bant genişliği ve ebeveyn denetimi yapılandırması.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* DISPLAY */}
+        <Section title="Görüntü Ayarları" icon={<Monitor className="h-5 w-5" />}>
         <ChoiceRow
           label="Sinema Modu"
           options={["Standart", "Sinema", "Canlı", "Spor", "Oyun", "HDR Pro"]}
@@ -338,6 +363,7 @@ export function SettingsView({
           </div>
         </div>
       </Section>
+      </div>
     </div>
   );
 }

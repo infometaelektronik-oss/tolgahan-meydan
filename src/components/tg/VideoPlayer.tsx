@@ -709,14 +709,7 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
         >
           <div
             ref={ytMountRef}
-            className="pointer-events-none w-full h-full relative"
-            style={{
-              width: "106%",
-              height: "116%",
-              position: "absolute",
-              top: "-8%",
-              left: "-3%",
-            }}
+            className="pointer-events-none w-full h-full absolute inset-0 [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:absolute [&>iframe]:inset-0"
           />
         </div>
       ) : (
@@ -730,15 +723,17 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
           poster={media.backdrop}
         />
       )}
-      <div className="absolute right-6 top-6 z-30 pointer-events-none opacity-40 mix-blend-screen select-none md:right-10 md:top-10">
-        <div className="flex items-center gap-2 rounded-lg bg-black/30 p-1.5 backdrop-blur-sm border border-white/10">
-          <img
-            src="/assets/aistudio/Media_item_1_1bba30da.jpg"
-            alt="TG Logo"
-            className="h-6 w-6 rounded object-cover"
-          />
-          <div className="text-[10px] font-black uppercase tracking-widest text-white/90">TG DİZİ FİLM</div>
-        </div>
+      {/* Direct broadcast logo watermark (embedded on stream, no background panel/box) */}
+      <div className="absolute right-6 top-6 z-30 pointer-events-none select-none md:right-8 md:top-8">
+        <img
+          src={
+            media.poster && (media.poster.includes("tgtv") || media.id?.startsWith("tgtv-"))
+              ? media.poster
+              : "/assets/tgtv-logos/tgtv-genel.png"
+          }
+          alt={media.title || "TG TV Logo"}
+          className="h-10 w-auto object-contain sm:h-14 md:h-16 drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)] filter"
+        />
       </div>
       {/* clear glass — no top/bottom gradient shadow */}
 

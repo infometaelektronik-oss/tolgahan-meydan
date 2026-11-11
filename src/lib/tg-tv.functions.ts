@@ -1,7 +1,22 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-export type TGChannelId = "tgtv-hd" | "tgtv-sinema" | "tgtv-sinema2" | "tgtv-yerli" | "tgtv-spor" | "tgtv-eglence";
+export type TGChannelId =
+  | "tgtv-hd"
+  | "tgtv-sinema"
+  | "tgtv-sinema2"
+  | "tgtv-yesilcam"
+  | "tgtv-yerli"
+  | "tgtv-spor"
+  | "tgtv-eglence"
+  | "tgtv-cocuk"
+  | "tgtv-belgesel"
+  | "tgtv-muzik"
+  | "tgtv-haber"
+  | "tgtv-dini"
+  | "tgtv-yasam"
+  | "tgtv-yemek"
+  | "tgtv-oyun";
 
 export interface TGChannelInfo {
   id: TGChannelId;
@@ -12,6 +27,27 @@ export interface TGChannelInfo {
   genre: string;
   color: string;
   fallbackStreamUrl: string;
+  logoUrl: string;
+}
+
+export function getTGTVLogo(channelId?: string | null): string {
+  if (!channelId) return "/assets/tgtv-logos/tgtv-genel.png";
+  const id = channelId.toLowerCase();
+  if (id.includes("sinema2") || id.includes("yerli-sinema")) return "/assets/tgtv-logos/tgtv-yerli-sinema.png";
+  if (id.includes("yesilcam") || id.includes("yeşilçam")) return "/assets/tgtv-logos/tgtv-yesilcam.png";
+  if (id.includes("sinema")) return "/assets/tgtv-logos/tgtv-sinema.png";
+  if (id.includes("yerli") || id.includes("dizi")) return "/assets/tgtv-logos/tgtv-dizi.png";
+  if (id.includes("spor")) return "/assets/tgtv-logos/tgtv-spor.png";
+  if (id.includes("eglence") || id.includes("eğlence")) return "/assets/tgtv-logos/tgtv-eglence.png";
+  if (id.includes("cocuk") || id.includes("çocuk")) return "/assets/tgtv-logos/tgtv-cocuk.png";
+  if (id.includes("belgesel")) return "/assets/tgtv-logos/tgtv-belgesel.png";
+  if (id.includes("muzik") || id.includes("müzik")) return "/assets/tgtv-logos/tgtv-muzik.png";
+  if (id.includes("haber")) return "/assets/tgtv-logos/tgtv-haber.png";
+  if (id.includes("dini")) return "/assets/tgtv-logos/tgtv-dini.png";
+  if (id.includes("yasam") || id.includes("yaşam")) return "/assets/tgtv-logos/tgtv-yasam.png";
+  if (id.includes("yemek")) return "/assets/tgtv-logos/tgtv-yemek.png";
+  if (id.includes("oyun")) return "/assets/tgtv-logos/tgtv-oyun.png";
+  return "/assets/tgtv-logos/tgtv-genel.png";
 }
 
 export const TG_CHANNELS: TGChannelInfo[] = [
@@ -24,6 +60,7 @@ export const TG_CHANNELS: TGChannelInfo[] = [
     genre: "Genel",
     color: "from-purple-600 to-indigo-600",
     fallbackStreamUrl: "https://www.youtube.com/watch?v=ZvXzoYwm-GU",
+    logoUrl: "/assets/tgtv-logos/tgtv-genel.png",
   },
   {
     id: "tgtv-sinema",
@@ -34,6 +71,7 @@ export const TG_CHANNELS: TGChannelInfo[] = [
     genre: "Türk Sineması",
     color: "from-amber-600 to-red-600",
     fallbackStreamUrl: "https://www.youtube.com/watch?v=hf2-8MRPGu8",
+    logoUrl: "/assets/tgtv-logos/tgtv-sinema.png",
   },
   {
     id: "tgtv-sinema2",
@@ -44,36 +82,139 @@ export const TG_CHANNELS: TGChannelInfo[] = [
     genre: "Yabancı Sinema",
     color: "from-rose-600 to-red-800",
     fallbackStreamUrl: "https://www.youtube.com/watch?v=Kb2cGTSMLYo",
+    logoUrl: "/assets/tgtv-logos/tgtv-yerli-sinema.png",
+  },
+  {
+    id: "tgtv-yesilcam",
+    name: "TG TV YEŞİLÇAM",
+    badge: "NOSTALJİ KLASİKLERİ",
+    number: 104,
+    description: "Kemal Sunal, Şener Şen, Münir Özkul ve Adile Naşit ile efsane Türk nostalji sineması.",
+    genre: "Yeşilçam & Nostalji",
+    color: "from-emerald-600 to-green-700",
+    fallbackStreamUrl: "https://www.youtube.com/watch?v=KRy20M7uQM4",
+    logoUrl: "/assets/tgtv-logos/tgtv-yesilcam.png",
   },
   {
     id: "tgtv-yerli",
     name: "TG TV YERLİ",
     badge: "YERLİ DİZİ",
-    number: 104,
+    number: 105,
     description: "Kurtlar Vadisi, Ezel, Çukur, İçerde ve efsane Türk dizileri kuşağı.",
-    genre: "Dizi & Nostalji",
+    genre: "Yerli Dizi",
     color: "from-blue-600 to-cyan-600",
     fallbackStreamUrl: "https://www.youtube.com/watch?v=DkAHxvoA2Q8",
+    logoUrl: "/assets/tgtv-logos/tgtv-dizi.png",
   },
   {
     id: "tgtv-spor",
     name: "TG TV SPOR",
     badge: "EFSANE MAÇLAR",
-    number: 105,
+    number: 106,
     description: "Tarihi maçlar, Galatasaray UEFA Kupası zaferi, efsane derbiler ve yarış özetleri.",
     genre: "Spor",
-    color: "from-emerald-600 to-teal-600",
+    color: "from-amber-500 to-yellow-600",
     fallbackStreamUrl: "https://www.youtube.com/watch?v=_pcWD8XLhPI",
+    logoUrl: "/assets/tgtv-logos/tgtv-spor.png",
   },
   {
     id: "tgtv-eglence",
     name: "TG TV EĞLENCE",
     badge: "TELEVİZYON PROGRAMLARI",
-    number: 106,
+    number: 107,
     description: "Güldür Güldür Show, Çok Güzel Hareketler Bunlar, Beyaz Show ve gündüz kuşağı şovları.",
     genre: "Eğlence",
     color: "from-fuchsia-600 to-pink-600",
     fallbackStreamUrl: "https://www.youtube.com/watch?v=2CIzV5lraqk",
+    logoUrl: "/assets/tgtv-logos/tgtv-eglence.png",
+  },
+  {
+    id: "tgtv-cocuk",
+    name: "TG TV ÇOCUK",
+    badge: "ÇİZGİ DİZİ & ANİMASYON",
+    number: 108,
+    description: "Rafadan Tayfa, Kral Şakir, Pepe ve çocuklara özel animasyonlar ve eğlenceli içerikler.",
+    genre: "Çocuk",
+    color: "from-orange-500 to-amber-600",
+    fallbackStreamUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    logoUrl: "/assets/tgtv-logos/tgtv-cocuk.png",
+  },
+  {
+    id: "tgtv-belgesel",
+    name: "TG TV BELGESEL",
+    badge: "DOĞA & TARİH & BİLİM",
+    number: 109,
+    description: "Yaban hayatı, Osmanlı ve dünya tarihi, uzay keşifleri ve derin bilim belgeselleri.",
+    genre: "Belgesel",
+    color: "from-teal-600 to-emerald-700",
+    fallbackStreamUrl: "https://www.youtube.com/watch?v=hf2-8MRPGu8",
+    logoUrl: "/assets/tgtv-logos/tgtv-belgesel.png",
+  },
+  {
+    id: "tgtv-muzik",
+    name: "TG TV MÜZİK",
+    badge: "TOP HİTLER & KLİPLER",
+    number: 110,
+    description: "Türkçe pop, rock, nostalji klipler, akustik konserler ve 7/24 kesintisiz müzik ziyafeti.",
+    genre: "Müzik",
+    color: "from-pink-600 to-rose-600",
+    fallbackStreamUrl: "https://www.youtube.com/watch?v=2CIzV5lraqk",
+    logoUrl: "/assets/tgtv-logos/tgtv-muzik.png",
+  },
+  {
+    id: "tgtv-haber",
+    name: "TG TV HABER",
+    badge: "GÜNCEL & ANALİZ",
+    number: 111,
+    description: "Türkiye ve dünya gündemi, ekonomi analizleri, canlı bağlantılar ve özel haber bültenleri.",
+    genre: "Haber",
+    color: "from-sky-600 to-blue-700",
+    fallbackStreamUrl: "https://www.youtube.com/watch?v=ZvXzoYwm-GU",
+    logoUrl: "/assets/tgtv-logos/tgtv-haber.png",
+  },
+  {
+    id: "tgtv-dini",
+    name: "TG TV DİNİ",
+    badge: "MANEVİYAT & SOHBET",
+    number: 112,
+    description: "Huzur veren Kur'an tilavetleri, İslam tarihi, cuma sohbetleri ve manevi programlar.",
+    genre: "Dini",
+    color: "from-cyan-600 to-teal-700",
+    fallbackStreamUrl: "https://www.youtube.com/watch?v=hf2-8MRPGu8",
+    logoUrl: "/assets/tgtv-logos/tgtv-dini.png",
+  },
+  {
+    id: "tgtv-yasam",
+    name: "TG TV YAŞAM",
+    badge: "SAĞLIK & GEZİ",
+    number: 113,
+    description: "Sağlıklı yaşam tüyoları, seyahat rehberleri, kültür gezileri ve dekorasyon fikirleri.",
+    genre: "Yaşam",
+    color: "from-fuchsia-500 to-purple-600",
+    fallbackStreamUrl: "https://www.youtube.com/watch?v=2CIzV5lraqk",
+    logoUrl: "/assets/tgtv-logos/tgtv-yasam.png",
+  },
+  {
+    id: "tgtv-yemek",
+    name: "TG TV YEMEK",
+    badge: "GASTRONOMİ & TARİFLER",
+    number: 114,
+    description: "Geleneksel Türk mutfağı, lezzet ustalarından tarifler, sokak lezzetleri ve tatlılar.",
+    genre: "Yemek",
+    color: "from-amber-600 to-orange-700",
+    fallbackStreamUrl: "https://www.youtube.com/watch?v=ZvXzoYwm-GU",
+    logoUrl: "/assets/tgtv-logos/tgtv-yemek.png",
+  },
+  {
+    id: "tgtv-oyun",
+    name: "TG TV OYUN",
+    badge: "ESPOR & OYUN DÜNYASI",
+    number: 115,
+    description: "Büyük e-spor turnuvaları, oyun incelemeleri, canlı oyun maratonları ve teknoloji.",
+    genre: "Oyun",
+    color: "from-blue-600 to-indigo-700",
+    fallbackStreamUrl: "https://www.youtube.com/watch?v=_pcWD8XLhPI",
+    logoUrl: "/assets/tgtv-logos/tgtv-oyun.png",
   },
 ];
 
@@ -376,6 +517,196 @@ async function ensureChannelSchedule(channelId: TGChannelId): Promise<void> {
         title: "Avrupa Yakası En Çok Güldüren Bölümler",
         description: "Burhan Altıntop, Aslı, Volkan ve Gaffur ile Nişantaşı komedisi.",
         stream_url: "https://www.youtube.com/watch?v=2CIzV5lraqk",
+        poster_url: officialLogo,
+        durationHours: 2,
+      },
+    ];
+  } else if (channelId === "tgtv-yesilcam") {
+    // 7/24 Türk Yeşilçam Nostalji Sineması
+    pool = [
+      {
+        title: "Yeşilçam Klasikleri: Süt Kardeşler",
+        description: "Şaban ve Ramazan'ın Gulyabani macerası ve unutulmaz komedi.",
+        stream_url: "https://www.youtube.com/watch?v=KRy20M7uQM4",
+        poster_url: officialLogo,
+        durationHours: 1.75,
+      },
+      {
+        title: "Yeşilçam Klasikleri: Şabanoğlu Şaban",
+        description: "Nazar Boncuğu hırsızının peşindeki sakar dedektifler.",
+        stream_url: "https://www.youtube.com/watch?v=ZDoLID8feBU",
+        poster_url: officialLogo,
+        durationHours: 1.75,
+      },
+      {
+        title: "Yeşilçam Klasikleri: Neşeli Günler",
+        description: "Turşunun sirkeyle mi yoksa limonla mı yapıldığı kavgası.",
+        stream_url: "https://www.youtube.com/watch?v=lxeKZU0VsyY",
+        poster_url: officialLogo,
+        durationHours: 1.75,
+      },
+      {
+        title: "Yeşilçam Klasikleri: Kibar Feyzo",
+        description: "Maho Ağa ve Feyzo'nun hak ve adalet arayışı.",
+        stream_url: "https://www.youtube.com/watch?v=stOXnCPxOws",
+        poster_url: officialLogo,
+        durationHours: 1.75,
+      },
+    ];
+  } else if (channelId === "tgtv-cocuk") {
+    // TG TV Çocuk - Çizgi Film & Animasyon
+    pool = [
+      {
+        title: "Rafadan Tayfa: Mahallede Macera",
+        description: "Hayri, Kamil, Mert ve Akın'ın heyecan dolu mahalle maceraları.",
+        stream_url: "https://www.youtube.com/watch?v=hf2-8MRPGu8",
+        poster_url: officialLogo,
+        durationHours: 1.5,
+      },
+      {
+        title: "Kral Şakir: Uzay Macerası",
+        description: "Şakir, Remzi ve Fil Necati'nin kahkaha dolu serüvenleri.",
+        stream_url: "https://www.youtube.com/watch?v=ZvXzoYwm-GU",
+        poster_url: officialLogo,
+        durationHours: 1.5,
+      },
+      {
+        title: "Çocuk Sineması: Sevimli Dostlar",
+        description: "Eğlenceli ve öğretici çocuk animasyon kuşağı.",
+        stream_url: "https://www.youtube.com/watch?v=KRy20M7uQM4",
+        poster_url: officialLogo,
+        durationHours: 1.5,
+      },
+    ];
+  } else if (channelId === "tgtv-belgesel") {
+    // TG TV Belgesel - Doğa, Tarih, Bilim
+    pool = [
+      {
+        title: "Anadolu'nun Yaban Hayatı ve Gizli Cennetleri",
+        description: "Türkiye'nin muhteşem coğrafyası, vahşi doğası ve el değmemiş tabiatı.",
+        stream_url: "https://www.youtube.com/watch?v=hf2-8MRPGu8",
+        poster_url: officialLogo,
+        durationHours: 1.5,
+      },
+      {
+        title: "Derin Tarih: Osmanlı İmparatorluğu ve Başkent İstanbul",
+        description: "Tarihin dönüm noktaları, görkemli yapılar ve tarihi sırlar.",
+        stream_url: "https://www.youtube.com/watch?v=ZvXzoYwm-GU",
+        poster_url: officialLogo,
+        durationHours: 2,
+      },
+      {
+        title: "Evrenin Gizemleri & Sonsuz Uzay",
+        description: "Kara delikler, galaksiler ve uzay teknolojileri belgeseli.",
+        stream_url: "https://www.youtube.com/watch?v=Kb2cGTSMLYo",
+        poster_url: officialLogo,
+        durationHours: 1.5,
+      },
+    ];
+  } else if (channelId === "tgtv-muzik") {
+    // TG TV Müzik - Klipler, Konserler
+    pool = [
+      {
+        title: "Türkçe Pop Top 20 & Hit Klipler",
+        description: "Haftanın en çok dinlenen Türkçe pop şarkıları ve yüksek çözünürlüklü video klipleri.",
+        stream_url: "https://www.youtube.com/watch?v=2CIzV5lraqk",
+        poster_url: officialLogo,
+        durationHours: 2,
+      },
+      {
+        title: "Akustik Sahne & Nostalji Konserleri",
+        description: "Unutulmaz sanatçılardan canlı performanslar ve özel akustik kayıtlar.",
+        stream_url: "https://www.youtube.com/watch?v=2CIzV5lraqk",
+        poster_url: officialLogo,
+        durationHours: 2,
+      },
+    ];
+  } else if (channelId === "tgtv-haber") {
+    // TG TV Haber - Gündem, Ekonomi
+    pool = [
+      {
+        title: "Ana Haber Bülteni & Günün Özeti",
+        description: "Günün en sıcak gelişmeleri, tarafsız bakış ve detaylı analizler.",
+        stream_url: "https://www.youtube.com/watch?v=ZvXzoYwm-GU",
+        poster_url: officialLogo,
+        durationHours: 1.5,
+      },
+      {
+        title: "Ekonomi Dünyası & Piyasa Yorumları",
+        description: "Finans dünyasındaki son gelişmeler, piyasa göstergeleri ve uzman görüşleri.",
+        stream_url: "https://www.youtube.com/watch?v=ZvXzoYwm-GU",
+        poster_url: officialLogo,
+        durationHours: 1.5,
+      },
+    ];
+  } else if (channelId === "tgtv-dini") {
+    // TG TV Dini - Maneviyat, Sohbet
+    pool = [
+      {
+        title: "Huzur Vakti: Kur'an-ı Kerim Tilaveti ve Meali",
+        description: "Gönüllere ferahlık veren eşsiz Kur'an tilaveti ve anlamı.",
+        stream_url: "https://www.youtube.com/watch?v=hf2-8MRPGu8",
+        poster_url: officialLogo,
+        durationHours: 2,
+      },
+      {
+        title: "İslam Tarihi ve Peygamberler Mirası",
+        description: "Asr-ı Saadet'ten günümüze İslam ahlakı ve örnek hayatlar.",
+        stream_url: "https://www.youtube.com/watch?v=hf2-8MRPGu8",
+        poster_url: officialLogo,
+        durationHours: 2,
+      },
+    ];
+  } else if (channelId === "tgtv-yasam") {
+    // TG TV Yaşam - Gezi, Sağlık
+    pool = [
+      {
+        title: "Adım Adım Türkiye: Gezi Rehberi",
+        description: "Ege köylerinden Karadeniz yaylalarına uzanan eşsiz bir seyahat programı.",
+        stream_url: "https://www.youtube.com/watch?v=2CIzV5lraqk",
+        poster_url: officialLogo,
+        durationHours: 1.5,
+      },
+      {
+        title: "Sağlıklı Yaşam & İyi Yaşam Sırları",
+        description: "Uzman hekimlerden doğru beslenme ve zinde kalma önerileri.",
+        stream_url: "https://www.youtube.com/watch?v=2CIzV5lraqk",
+        poster_url: officialLogo,
+        durationHours: 1.5,
+      },
+    ];
+  } else if (channelId === "tgtv-yemek") {
+    // TG TV Yemek - Lezzet, Tarif
+    pool = [
+      {
+        title: "Ustalardan Geleneksel Anadolu Lezzetleri",
+        description: "Gaziantep, Hatay ve Karadeniz mutfağının en leziz ustalık yemekleri.",
+        stream_url: "https://www.youtube.com/watch?v=ZvXzoYwm-GU",
+        poster_url: officialLogo,
+        durationHours: 1.5,
+      },
+      {
+        title: "Sokak Lezzetleri & Gurme Durakları",
+        description: "Türkiye'nin en popüler sokak lezzetleri ve tatlı durakları.",
+        stream_url: "https://www.youtube.com/watch?v=ZvXzoYwm-GU",
+        poster_url: officialLogo,
+        durationHours: 1.5,
+      },
+    ];
+  } else if (channelId === "tgtv-oyun") {
+    // TG TV Oyun - E-spor, Teknoloji
+    pool = [
+      {
+        title: "E-Spor Şampiyonlar Ligi Büyük Finalleri",
+        description: "CS:GO, Valorant ve League of Legends dev turnuva heyecanı.",
+        stream_url: "https://www.youtube.com/watch?v=_pcWD8XLhPI",
+        poster_url: officialLogo,
+        durationHours: 2,
+      },
+      {
+        title: "Oyun Dünyası & Yeni Nesil İncelemeler",
+        description: "En son çıkan oyunlar, donanım testleri ve oyun dünyasından haberler.",
+        stream_url: "https://www.youtube.com/watch?v=_pcWD8XLhPI",
         poster_url: officialLogo,
         durationHours: 2,
       },

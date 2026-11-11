@@ -1,19 +1,37 @@
-import { Home, Tv, CalendarClock, Clapperboard, Film, Search, Settings, Radio, Sparkles, ShieldCheck } from "lucide-react";
+import {
+  Sparkles,
+  Tv2,
+  RadioTower,
+  Clock4,
+  Clapperboard,
+  Film,
+  Zap,
+  Compass,
+  Sliders,
+  ShieldAlert,
+} from "lucide-react";
 import { forwardRef, useEffect, useMemo, useState } from "react";
 
-type Item = { id: string; label: string; icon: React.ComponentType<{ className?: string }>; navIndex: number; href?: string };
+type Item = {
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  navIndex: number;
+  href?: string;
+  neonColor: string;
+};
 
 const ALL_ITEMS: Item[] = [
-  { id: "home", label: "Ana Sayfa", icon: Home, navIndex: 0 },
-  { id: "live", label: "Canlı TV", icon: Tv, navIndex: 1 },
-  { id: "radio", label: "Radyo", icon: Radio, navIndex: 2 },
-  { id: "schedule", label: "Yayın Akışı", icon: CalendarClock, navIndex: 3 },
-  { id: "series", label: "Diziler", icon: Clapperboard, navIndex: 4 },
-  { id: "movies", label: "Filmler", icon: Film, navIndex: 5 },
-  { id: "tgtv", label: "TG TV", icon: Sparkles, navIndex: 6 },
-  { id: "search", label: "Ara", icon: Search, navIndex: 7 },
-  { id: "settings", label: "Ayarlar", icon: Settings, navIndex: 8 },
-  { id: "admin", label: "Yönetim", icon: ShieldCheck, navIndex: 9, href: "/tgdizifilm-admin-paneli" },
+  { id: "home", label: "Ana Sayfa", icon: Sparkles, navIndex: 0, neonColor: "text-purple-400 group-hover:text-purple-300 drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]" },
+  { id: "live", label: "Canlı TV", icon: Tv2, navIndex: 1, neonColor: "text-rose-400 group-hover:text-rose-300 drop-shadow-[0_0_8px_rgba(244,63,94,0.8)]" },
+  { id: "radio", label: "Radyo", icon: RadioTower, navIndex: 2, neonColor: "text-amber-400 group-hover:text-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.8)]" },
+  { id: "schedule", label: "Yayın Akışı", icon: Clock4, navIndex: 3, neonColor: "text-cyan-400 group-hover:text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]" },
+  { id: "series", label: "Diziler", icon: Clapperboard, navIndex: 4, neonColor: "text-blue-400 group-hover:text-blue-300 drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]" },
+  { id: "movies", label: "Filmler", icon: Film, navIndex: 5, neonColor: "text-amber-500 group-hover:text-amber-400 drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]" },
+  { id: "tgtv", label: "TG TV", icon: Zap, navIndex: 6, neonColor: "text-fuchsia-400 group-hover:text-fuchsia-300 drop-shadow-[0_0_12px_rgba(217,70,239,0.9)]" },
+  { id: "search", label: "Ara", icon: Compass, navIndex: 7, neonColor: "text-emerald-400 group-hover:text-emerald-300 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]" },
+  { id: "settings", label: "Ayarlar", icon: Sliders, navIndex: 8, neonColor: "text-indigo-400 group-hover:text-indigo-300 drop-shadow-[0_0_8px_rgba(129,140,248,0.8)]" },
+  { id: "admin", label: "Yönetim", icon: ShieldAlert, navIndex: 9, href: "/tgdizifilm-admin-paneli", neonColor: "text-red-500 group-hover:text-red-400 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" },
 ];
 
 type Props = {
@@ -97,13 +115,13 @@ export const Sidebar = forwardRef<HTMLElement, Props>(function Sidebar(
                     isFocused
                       ? "neon-ring scale-105 bg-purple-600/20 text-white"
                       : isActive
-                        ? "bg-white/5 text-white"
-                        : "text-white/60 hover:text-white"
+                        ? "bg-white/10 text-white font-bold shadow-[0_0_15px_rgba(168,85,247,0.3)]"
+                        : "text-white/60 hover:text-white hover:bg-white/5"
                   }`}
                 >
-                  <Icon className={`h-6 w-6 shrink-0 ${isFocused ? "text-purple-300" : ""}`} />
+                  <Icon className={`h-6 w-6 shrink-0 transition-transform duration-200 group-hover:scale-110 ${isActive ? it.neonColor : "text-white/60 group-hover:text-white"}`} />
                   {focused && (
-                    <span className="truncate text-base font-medium">{it.label}</span>
+                    <span className="truncate text-base font-semibold">{it.label}</span>
                   )}
                 </button>
               );
@@ -154,7 +172,7 @@ export const Sidebar = forwardRef<HTMLElement, Props>(function Sidebar(
               }`}
             >
               <Icon
-                className={`h-5 w-5 ${isActive ? "drop-shadow-[0_0_8px_rgba(192,132,252,0.9)]" : ""}`}
+                className={`h-5 w-5 ${isActive ? it.neonColor : ""}`}
               />
               <span className="text-[10px] font-semibold">{it.label}</span>
             </button>

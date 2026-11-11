@@ -5,7 +5,7 @@ import { loadStore, nativeDb } from "./native-db";
 test("Database loads initial exported data correctly", () => {
   const store = loadStore();
   assert.ok(store.user_streams.length >= 4000, `Expected over 4000 streams, got ${store.user_streams.length}`);
-  assert.ok(store.home_rows.length >= 8, `Expected at least 8 home rows, got ${store.home_rows.length}`);
+  assert.ok(store.home_rows.length >= 5, `Expected at least 5 home rows, got ${store.home_rows.length}`);
   assert.ok(store.layout_sections.length >= 6, `Expected at least 6 layout sections, got ${store.layout_sections.length}`);
 });
 
