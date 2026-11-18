@@ -1,4 +1,6 @@
 import express from "express";
+import fs from "fs";
+import crypto from "crypto";
 import path from "path";
 import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
@@ -53,28 +55,87 @@ async function startServer() {
     res.json(loadStore(true));
   });
 
-  // Resilient image proxy with browser user-agent & caching
+  // Resilient image proxy with disk + in-memory cache, Wikimedia-safe UA & local fallback
+  const imageCacheDir = path.resolve(__dirname, ".cache/image-proxy");
+  try {
+    fs.mkdirSync(imageCacheDir, { recursive: true });
+  } catch {}
+  const imageMemCache = new Map<string, { contentType: string; data: Buffer }>();
+  const localFallbackPoster = path.resolve(__dirname, "public/assets/aistudio/Media_item_1_1bba30da.jpg");
+
+  const sendFallbackImage = (res: express.Response) => {
+    try {
+      if (fs.existsSync(localFallbackPoster)) {
+        res.setHeader("Content-Type", "image/jpeg");
+        res.setHeader("Cache-Control", "public, max-age=3600");
+        res.setHeader("X-Image-Fallback", "1");
+        return res.sendFile(localFallbackPoster);
+      }
+    } catch {}
+    return res.status(404).send("Image not available");
+  };
+
   app.get("/api/image-proxy", async (req, res) => {
     const rawUrl = req.query.url as string;
-    if (!rawUrl) return res.status(400).send("Missing url");
+    if (!rawUrl || !/^https?:\/\//i.test(rawUrl)) return sendFallbackImage(res);
+
+    const cacheKey = crypto.createHash("sha256").update(rawUrl).digest("hex");
+    const memHit = imageMemCache.get(cacheKey);
+    if (memHit) {
+      res.setHeader("Content-Type", memHit.contentType);
+      res.setHeader("Cache-Control", "public, max-age=604800, immutable");
+      return res.send(memHit.data);
+    }
+
+    const diskImgPath = path.join(imageCacheDir, `${cacheKey}.bin`);
+    const diskMetaPath = path.join(imageCacheDir, `${cacheKey}.json`);
     try {
-      const response = await fetch(rawUrl, {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-          Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
-          Referer: "https://www.google.com/",
-        },
-      });
+      if (fs.existsSync(diskImgPath) && fs.existsSync(diskMetaPath)) {
+        const meta = JSON.parse(fs.readFileSync(diskMetaPath, "utf8"));
+        const data = fs.readFileSync(diskImgPath);
+        if (data.length > 500) {
+          imageMemCache.set(cacheKey, { contentType: meta.contentType || "image/jpeg", data });
+          res.setHeader("Content-Type", meta.contentType || "image/jpeg");
+          res.setHeader("Cache-Control", "public, max-age=604800, immutable");
+          return res.send(data);
+        }
+      }
+    } catch {}
+
+    try {
+      const isWiki = rawUrl.includes("wikimedia.org") || rawUrl.includes("wikipedia.org");
+      const headers: Record<string, string> = isWiki
+        ? {
+            "User-Agent": "TGDiziFilmPlatform/1.0 (https://tgdizifilm.local; media@tgdizifilm.local)",
+            Accept: "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+          }
+        : {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+            Accept: "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+            Referer: "https://www.google.com/",
+          };
+
+      const response = await fetch(rawUrl, { headers, redirect: "follow" });
       if (!response.ok) {
-        return res.redirect(rawUrl);
+        return sendFallbackImage(res);
       }
       const contentType = response.headers.get("content-type") || "image/jpeg";
+      const buffer = Buffer.from(await response.arrayBuffer());
+      if (buffer.length < 500 || contentType.includes("text/html")) {
+        return sendFallbackImage(res);
+      }
+
+      imageMemCache.set(cacheKey, { contentType, data: buffer });
+      try {
+        fs.writeFileSync(diskImgPath, buffer);
+        fs.writeFileSync(diskMetaPath, JSON.stringify({ contentType, url: rawUrl }));
+      } catch {}
+
       res.setHeader("Content-Type", contentType);
       res.setHeader("Cache-Control", "public, max-age=604800, immutable");
-      const buffer = Buffer.from(await response.arrayBuffer());
-      res.send(buffer);
+      return res.send(buffer);
     } catch {
-      res.redirect(rawUrl);
+      return sendFallbackImage(res);
     }
   });
 
@@ -590,20 +651,27 @@ Size nasıl yardımcı olabilirim?`;
         let newsCount = 0;
 
         for (const s of streams) {
+          // Never overwrite VOD Movies/Series genre & platform sub_category with Live TV subcategories
+          if (s.category === "Movies" || s.category === "Series") {
+            continue;
+          }
           const res = detectOriginAndSubCategory(s.title, s.source_url, s.channel_group);
+          const nextSub = s.category === "Radio"
+            ? (res.isForeign ? "Yabancı Radyo" : "Ulusal Radyo")
+            : res.subCategory;
           const changed =
             s.is_foreign !== res.isForeign ||
             s.country !== (res.country || null) ||
-            s.sub_category !== res.subCategory;
+            s.sub_category !== nextSub;
           if (changed) {
             s.is_foreign = res.isForeign;
             s.country = res.country || null;
-            s.sub_category = res.subCategory;
+            s.sub_category = nextSub;
             updatedCount++;
           }
           if (!res.isForeign) trCount++;
           else foreignCount++;
-          if (res.subCategory === "Haber" || res.subCategory === "Yabancı Haber") newsCount++;
+          if (nextSub === "Haber" || nextSub === "Yabancı Haber") newsCount++;
         }
         store.user_streams = streams;
         saveStore(store);

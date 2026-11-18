@@ -46,3 +46,24 @@ iframe {
   height: 100% !important;
   border: 0;
 }
+
+/* TG TV Logo Motion: Physical 3D floating and tilting animation */
+@keyframes logo-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translateY(-4px) rotate(-1.5deg) scale(1.02);
+  }
+  50% {
+    transform: translateY(2px) rotate(1deg) scale(0.99);
+  }
+  75% {
+    transform: translateY(-3px) rotate(1.5deg) scale(1.01);
+  }
+}
+
+.animate-logo-float {
+  animation: logo-float 4s ease-in-out infinite;
+  will-change: transform;
+}

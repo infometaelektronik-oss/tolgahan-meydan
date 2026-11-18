@@ -167,8 +167,13 @@ export function CardManager({ streams, onChanged }: Props) {
         const subLow = (s.subCategory || "").toLowerCase();
         const grpLow = (s.channelGroup || "").toLowerCase();
         const filterLow = subFilter.toLowerCase();
-        const match = subLow.includes(filterLow) || grpLow.includes(filterLow);
-        if (!match) return false;
+        if (filterLow === "spor") {
+          const match = (subLow === "spor" || grpLow === "spor") && !s.isForeign;
+          if (!match) return false;
+        } else {
+          const match = subLow.includes(filterLow) || grpLow.includes(filterLow);
+          if (!match) return false;
+        }
       }
 
       // Country filter
@@ -595,7 +600,7 @@ export function CardManager({ streams, onChanged }: Props) {
 
                 <img
                   loading="lazy"
-                  src={s.posterUrl || `https://picsum.photos/seed/${s.id}/120/180`}
+                  src={s.posterUrl || "/assets/aistudio/Media_item_1_1bba30da.jpg"}
                   alt={s.title}
                   className="h-14 w-11 rounded-lg object-cover bg-neutral-900 border border-white/10"
                 />

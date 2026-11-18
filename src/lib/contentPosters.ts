@@ -1,338 +1,185 @@
 /**
  * Comprehensive Verified Poster Directory for Turkish & Foreign Series & Movies.
- * Proxies Wikimedia and external images via `/api/image-proxy` to ensure 100% 200 OK delivery.
+ * All 76 core titles are locally cached under `/assets/posters/<id>.jpg` for 100% 200 OK delivery.
  */
 
-function proxy(url: string): string {
-  if (url.startsWith("/") || url.startsWith("data:")) return url;
-  return `/api/image-proxy?url=${encodeURIComponent(url)}`;
+function localPoster(id: string, ext: "jpg" | "svg" = "jpg"): string {
+  return `/assets/posters/${id}.${ext}`;
+}
+
+function localPair(id: string, ext: "jpg" | "svg" = "jpg"): { poster: string; backdrop: string } {
+  const path = localPoster(id, ext);
+  return { poster: path, backdrop: path };
 }
 
 export const VERIFIED_POSTERS: Record<string, { poster: string; backdrop: string }> = {
   // === TÜRK DİZİLERİ ===
-  "tr-dizi-kurulus-osman": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/d/d2/Edip_Osman_Somuno%C4%9Flu.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-yali-capkini": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/9/96/Yal%C4%B1%C3%87apk%C4%B1n%C4%B1Dizi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-bahar": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/0/08/BaharDizi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-kizilcik-serbeti": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/0/03/K%C4%B1z%C4%B1lc%C4%B1k%C5%9Eerbeti.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-tas-kagit-makas": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/9/95/Ta%C5%9F_Ka%C4%9F%C4%B1t_Makas_afi%C5%9F.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-arka-sokaklar": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/4/49/Arka_Sokaklar_18._Sezon%27un_ikinci_afi%C5%9Fidir.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-yargi": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/b/b0/Yarg%C4%B1_afi%C5%9F.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-inci-taneleri": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/0/08/%C4%B0nciTaneleri.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-gonul-dagi": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/2/20/G%C3%B6n%C3%BClDa%C4%9F%C4%B1Afi%C5%9F.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-teskilat": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/7/77/Teskilat.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-behzat-c": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/3/30/Behzat_%C3%87._Bir_Ankara_Polisiyesi_afi%C5%9F.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-ezel": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/c/cb/Ezel_afi%C5%9F.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-kurtlar-vadisi": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/1/1f/Kurtlar-vadisi-eski.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-poyraz-karayel": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/1/18/Poyraz_Karayel_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-cukur": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/8/87/%C3%87ukur_dizi_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-icerde": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/9/9e/%C4%B0%C3%A7erde-Afi%C5%9F.jpeg"),
-    backdrop: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-soz": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/b/b2/S%C3%B6z_dizi_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-kiralik-ask": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/f/f9/Kiral%C4%B1k_A%C5%9Fk_dizi_afi%C5%9F.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-edho": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/f/fd/Edhoafi%C5%9F.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-kardeslerim": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/1/1e/Karde%C5%9Flerim_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-dirilis-ertugrul": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/f/fe/Dirili%C5%9F-_Ertu%C4%9Frul_S1.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-kizil-goncalar": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/f/f2/K%C4%B1z%C4%B1lGoncalar.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-hudutsuz-sevda": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/c/ca/Hudutsuz_Sevda_afi%C5%9F.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-dizi-avrupa-yakasi": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/6/66/Avrupa_Yakas%C4%B1_afi%C5%9F.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=1280&auto=format&fit=crop&q=80",
-  },
-  "series-ask-i-memnu": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/d/d4/A%C5%9Fk-%C4%B1_Memnu_%28dizi%2C_2008%29_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1280&auto=format&fit=crop&q=80",
-  },
-  "series-kuzey-guney": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/8/87/Kuzey_G%C3%BCney_afi%C5%9F.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1280&auto=format&fit=crop&q=80",
-  },
-  "series-muhtesem-yuzyil": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/9/91/Muhte%C5%9Fem_Y%C3%BCzy%C4%B1l_afi%C5%9F.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1514539079130-25950c84af65?w=1280&auto=format&fit=crop&q=80",
-  },
-  "series-leyla-ile-mecnun": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/7/70/Leyla_ile_Mecnun_afi%C5%9F.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1280&auto=format&fit=crop&q=80",
-  },
-  "series-bir-zamanlar-cukurova": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/4/4b/Bir_Zamanlar_%C3%87ukurova_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1280&auto=format&fit=crop&q=80",
-  },
-  "series-mucize-doktor": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/9/94/Mucize_Doktor_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=1280&auto=format&fit=crop&q=80",
-  },
+  "tr-dizi-kurulus-osman": localPair("tr-dizi-kurulus-osman"),
+  "tr-dizi-yali-capkini": localPair("tr-dizi-yali-capkini"),
+  "tr-dizi-bahar": localPair("tr-dizi-bahar"),
+  "tr-dizi-kizilcik-serbeti": localPair("tr-dizi-kizilcik-serbeti"),
+  "tr-dizi-tas-kagit-makas": localPair("tr-dizi-tas-kagit-makas"),
+  "tr-dizi-arka-sokaklar": localPair("tr-dizi-arka-sokaklar"),
+  "tr-dizi-yargi": localPair("tr-dizi-yargi"),
+  "tr-dizi-inci-taneleri": localPair("tr-dizi-inci-taneleri"),
+  "tr-dizi-gonul-dagi": localPair("tr-dizi-gonul-dagi"),
+  "tr-dizi-teskilat": localPair("tr-dizi-teskilat"),
+  "tr-dizi-behzat-c": localPair("tr-dizi-behzat-c"),
+  "tr-dizi-ezel": localPair("tr-dizi-ezel"),
+  "tr-dizi-kurtlar-vadisi": localPair("tr-dizi-kurtlar-vadisi"),
+  "tr-dizi-poyraz-karayel": localPair("tr-dizi-poyraz-karayel"),
+  "tr-dizi-cukur": localPair("tr-dizi-cukur"),
+  "tr-dizi-icerde": localPair("tr-dizi-icerde"),
+  "tr-dizi-soz": localPair("tr-dizi-soz"),
+  "tr-dizi-sana-soz": localPair("tr-dizi-sana-soz", "svg"),
+  "tr-dizi-kiralik-ask": localPair("tr-dizi-kiralik-ask"),
+  "tr-dizi-edho": localPair("tr-dizi-edho"),
+  "tr-dizi-kardeslerim": localPair("tr-dizi-kardeslerim"),
+  "tr-dizi-dirilis-ertugrul": localPair("tr-dizi-dirilis-ertugrul"),
+  "tr-dizi-kizil-goncalar": localPair("tr-dizi-kizil-goncalar"),
+  "tr-dizi-hudutsuz-sevda": localPair("tr-dizi-hudutsuz-sevda"),
+  "tr-dizi-avrupa-yakasi": localPair("tr-dizi-avrupa-yakasi"),
+  "series-ask-i-memnu": localPair("series-ask-i-memnu"),
+  "series-kuzey-guney": localPair("series-kuzey-guney"),
+  "series-muhtesem-yuzyil": localPair("series-muhtesem-yuzyil"),
+  "series-leyla-ile-mecnun": localPair("series-leyla-ile-mecnun"),
+  "series-bir-zamanlar-cukurova": localPair("series-bir-zamanlar-cukurova"),
+  "series-mucize-doktor": localPair("series-mucize-doktor"),
 
   // === YABANCI & PLATFORM DİZİLERİ ===
-  "world-dizi-breaking-bad": {
-    poster: "https://image.tmdb.org/t/p/w500/ggFHVNu6YYI5L9pCfOacjizRGt.jpg",
-    backdrop: "https://image.tmdb.org/t/p/w1280/9faGSFi5jam6pDWGNd0p8J24gvm.jpg",
-  },
-  "world-dizi-game-of-thrones": {
-    poster: "https://image.tmdb.org/t/p/w500/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg",
-    backdrop: "https://image.tmdb.org/t/p/w1280/2OMB0ynKlyIenMJWI2Dy9IWT4c.jpg",
-  },
-  "world-dizi-chernobyl": {
-    poster: "https://image.tmdb.org/t/p/w500/hlLXt2tOPT6RRnjiUmoxyG1LTFi.jpg",
-    backdrop: "https://image.tmdb.org/t/p/w1280/uL6Ad12W0bxyH4Ss7h76Sbgf4wh.jpg",
-  },
-  "series-netflix-stranger-things": {
-    poster: "https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg",
-    backdrop: "https://image.tmdb.org/t/p/w1280/56v2KjBlU4XaOv9rVYEQypROD7P.jpg",
-  },
-  "series-netflix-narcos": {
-    poster: "https://image.tmdb.org/t/p/w500/rTmal9fMfwhBX9o0yc3q4qB26gY.jpg",
-    backdrop: "https://image.tmdb.org/t/p/w1280/r0skVb9k4hZtY8u3rK7w4uN9yWw.jpg",
-  },
-  "series-hbo-house-of-dragon": {
-    poster: "https://image.tmdb.org/t/p/w500/7QMsOTMUswlwxJP0rTTZfmz2tX2.jpg",
-    backdrop: "https://image.tmdb.org/t/p/w1280/etjA2CSg4yAwhg5e1yE9a8L6y9Y.jpg",
-  },
-  "series-hbo-succession": {
-    poster: "https://image.tmdb.org/t/p/w500/7HW473ahJ966VqAPqByyo1V0Teb.jpg",
-    backdrop: "https://image.tmdb.org/t/p/w1280/c4p9sB74vNlT7c6y94Xw5Y7W8.jpg",
-  },
-  "series-hbo-the-sopranos": {
-    poster: "https://image.tmdb.org/t/p/w500/rTc7BtWLKSEKUrqjK44y9fGvNfB.jpg",
-    backdrop: "https://image.tmdb.org/t/p/w1280/7RyHsO4yDXtBv1z9y6p7w2E7t.jpg",
-  },
-  "series-hbo-the-last-of-us": {
-    poster: "https://image.tmdb.org/t/p/w500/uKvVjK1q1yt2Xb1x9q9v9Z6v0.jpg",
-    backdrop: "https://image.tmdb.org/t/p/w1280/uDgy6hyPd82kOHh6I95FLtLuv67.jpg",
-  },
-  "series-netflix-kulup": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/0/05/Kul%C3%BCp_dizisi_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1280&auto=format&fit=crop&q=80",
-  },
-  "series-netflix-bir-baskadir": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/e/e0/Bir_Ba%C5%9Fkad%C4%B1r_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1280&auto=format&fit=crop&q=80",
-  },
-  "series-netflix-terzi": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/8/87/Terzi_dizisi_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1280&auto=format&fit=crop&q=80",
-  },
-  "series-tabii-bozkir-arslani": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/4/4b/Mendirman_Jaloliddin.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1514539079130-25950c84af65?w=1280&auto=format&fit=crop&q=80",
-  },
-  "series-tabii-mevlana": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/9/9a/Mevlana_Celaleddin-i_Rumi_afi%C5%9F.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=1280&auto=format&fit=crop&q=80",
-  },
-  "series-tabii-adalet": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/7/7b/Adalet_dizisi_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=1280&auto=format&fit=crop&q=80",
-  },
-  "series-tabii-sebeke": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/3/30/%C5%9Eebeke_dizisi_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1280&auto=format&fit=crop&q=80",
-  },
+  "world-dizi-breaking-bad": localPair("world-dizi-breaking-bad"),
+  "world-dizi-game-of-thrones": localPair("world-dizi-game-of-thrones"),
+  "world-dizi-chernobyl": localPair("world-dizi-chernobyl"),
+  "world-dizi-sherlock": localPair("world-dizi-sherlock", "svg"),
+  "world-dizi-lucy": localPair("world-dizi-lucy", "svg"),
+  "world-dizi-dick-van-dyke": localPair("world-dizi-dick-van-dyke", "svg"),
+  "world-dizi-bonanza": localPair("world-dizi-bonanza", "svg"),
+  "world-dizi-robin-hood": localPair("world-dizi-robin-hood", "svg"),
+  "series-netflix-stranger-things": localPair("series-netflix-stranger-things"),
+  "series-netflix-narcos": localPair("series-netflix-narcos"),
+  "series-netflix-kulup": localPair("series-netflix-kulup"),
+  "series-netflix-bir-baskadir": localPair("series-netflix-bir-baskadir"),
+  "series-netflix-terzi": localPair("series-netflix-terzi"),
+  "series-netflix-our-planet": localPair("series-netflix-our-planet", "svg"),
+  "series-netflix-explained": localPair("series-netflix-explained", "svg"),
+  "series-netflix-abstract": localPair("series-netflix-abstract", "svg"),
+  "series-netflix-13th": localPair("series-netflix-13th", "svg"),
+  "series-hbo-house-of-dragon": localPair("series-hbo-house-of-dragon"),
+  "series-hbo-succession": localPair("series-hbo-succession"),
+  "series-hbo-the-sopranos": localPair("series-hbo-the-sopranos"),
+  "series-hbo-the-last-of-us": localPair("series-hbo-the-last-of-us"),
+  "series-hbo-john-oliver": localPair("series-hbo-john-oliver", "svg"),
+  "series-hbo-vice": localPair("series-hbo-vice", "svg"),
+  "series-hbo-witches": localPair("series-hbo-witches", "svg"),
+  "series-tabii-bozkir-arslani": localPair("series-tabii-bozkir-arslani"),
+  "series-tabii-mevlana": localPair("series-tabii-mevlana"),
+  "series-tabii-adalet": localPair("series-tabii-adalet"),
+  "series-tabii-sebeke": localPair("series-tabii-sebeke"),
+  "series-tabii-yanki": localPair("series-tabii-yanki", "svg"),
+  "series-tabii-cirak": localPair("series-tabii-cirak", "svg"),
+  "series-blutv-behzat-cekic": localPair("series-blutv-behzat-cekic"),
+  "series-blutv-prens": localPair("series-blutv-prens", "svg"),
+  "series-blutv-magarsus": localPair("series-blutv-magarsus", "svg"),
+  "series-blutv-ilk-ve-son": localPair("series-blutv-ilk-ve-son", "svg"),
+  "series-blutv-saygi": localPair("series-blutv-saygi", "svg"),
+  "series-disney-kacis": localPair("series-disney-kacis", "svg"),
+  "series-disney-aktris": localPair("series-disney-aktris", "svg"),
+  "series-disney-arayis": localPair("series-disney-arayis", "svg"),
+  "series-disney-dunya-aramda": localPair("series-disney-dunya-aramda", "svg"),
+  "series-disney-ben-gri": localPair("series-disney-ben-gri", "svg"),
+  "series-gain-ayak-isleri": localPair("series-gain-ayak-isleri", "svg"),
+  "series-gain-10-bin-adim": localPair("series-gain-10-bin-adim", "svg"),
+  "series-gain-dogu": localPair("series-gain-dogu", "svg"),
+  "series-gain-sahsiyet": localPair("series-gain-sahsiyet", "svg"),
+  "series-gain-haysiyet": localPair("series-gain-haysiyet", "svg"),
 
   // === FİLMLER (YEŞİLÇAM, YERLİ & YABANCI SİNEMA) ===
-  "tr-film-hababam-sinifi": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/8/87/Hababam_S%C4%B1n%C4%B1f%C4%B1_%28film%29.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-tosun-pasa": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/b/bb/Tosun_Pa%C5%9Fa_film_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-sut-kardesler": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/1/1a/S%C3%BCt_Karde%C5%9Fler.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-sabano-saban": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/1/16/%C5%9Eabano%C4%9Flu_%C5%9Eaban.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-kibar-feyzo": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/3/36/Kibar_Feyzo.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-copculer-krali": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/5/52/%C3%87%C3%B6p%C3%A7%C3%BCler_Kral%C4%B1_afi%C5%9F.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-neseli-gunler": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/1/10/Ne%C5%9Feli_G%C3%BCnler.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-sekerpare": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/7/77/%C5%9Eekerpare_film_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-selvi-boylum": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/9/94/Selvi_Boylum_Al_Yazmal%C4%B1m_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-kapicilar-krali": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/6/69/Kap%C4%B1c%C4%B1lar_Kral%C4%B1.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-gora": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/f/f6/G.O.R.A._afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-arog": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/d/d3/A.R.O.G_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-arif-v-216": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/e/e0/Arif_V_216_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-vizontele": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/3/30/Vizontele_afi%C5%9F.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-vizontele-tuuba": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/a/ae/Vizontele_Tuuba_afi%C5%9F.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-babam-ve-oglum": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/a/ad/Babam_ve_O%C4%9Flum.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-ayla": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/e/e5/Ayla_film_afi%C5%9F.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-7-kogustaki-mucize": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/e/eb/7._Ko%C4%9Fu%C5%9Ftaki_Mucize_afi%C5%9F.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-nefes": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/8/87/Nefes_Vatan_Sa%C4%9Folsun_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-dag-2": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/b/b3/Da%C4%9F_II_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-organize-isler": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/0/07/Organize_%C4%B0%C5%9Fler_Sazan_Sarmal%C4%B1_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-olumlu-dunya": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/f/f6/%C3%96l%C3%BCml%C3%BC_D%C3%BCnya_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-olumlu-dunya-2": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/f/f8/%C3%96l%C3%BCml%C3%BC_D%C3%BCnya_2_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=1280&auto=format&fit=crop&q=80",
-  },
-  "tr-film-cinayet-susu": {
-    poster: proxy("https://upload.wikimedia.org/wikipedia/tr/4/4b/Cinayet_S%C3%BCs%C3%BC_afi%C5%9Fi.jpg"),
-    backdrop: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=1280&auto=format&fit=crop&q=80",
-  },
-  "movie-interstellar": {
-    poster: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
-    backdrop: "https://image.tmdb.org/t/p/w1280/rAiYTrKGqDCRIIqo664sY9XZIvQ.jpg",
-  },
-  "movie-inception": {
-    poster: "https://image.tmdb.org/t/p/w500/edv5CZvWj09upOsy2Y6IwDhK8bt.jpg",
-    backdrop: "https://image.tmdb.org/t/p/w1280/s3TBrRGB1iav7gFOCNx3H31MoES.jpg",
-  },
-  "movie-the-dark-knight": {
-    poster: "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
-    backdrop: "https://image.tmdb.org/t/p/w1280/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg",
-  },
-  "movie-gladiator": {
-    poster: "https://image.tmdb.org/t/p/w500/ty8TGRuvJLPUmAR1H1nRIsgwvim.jpg",
-    backdrop: "https://image.tmdb.org/t/p/w1280/hZkgoQYus5vegHoetLkCJzb17zJ.jpg",
-  },
-  "movie-the-matrix": {
-    poster: "https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
-    backdrop: "https://image.tmdb.org/t/p/w1280/l4QHerTSbMI7qgvejvIjU92LRam.jpg",
-  },
-  "movie-the-shawshank-redemption": {
-    poster: "https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
-    backdrop: "https://image.tmdb.org/t/p/w1280/kXfqcdQKsToO0OUXHcrrNCHDBzO.jpg",
-  },
+  "tr-film-hababam-sinifi": localPair("tr-film-hababam-sinifi"),
+  "tr-film-tosun-pasa": localPair("tr-film-tosun-pasa"),
+  "tr-film-sut-kardesler": localPair("tr-film-sut-kardesler"),
+  "tr-film-sabano-saban": localPair("tr-film-sabano-saban"),
+  "tr-film-kibar-feyzo": localPair("tr-film-kibar-feyzo"),
+  "tr-film-copculer-krali": localPair("tr-film-copculer-krali"),
+  "tr-film-neseli-gunler": localPair("tr-film-neseli-gunler"),
+  "tr-film-sekerpare": localPair("tr-film-sekerpare"),
+  "tr-film-selvi-boylum": localPair("tr-film-selvi-boylum"),
+  "tr-film-kapicilar-krali": localPair("tr-film-kapicilar-krali"),
+  "tr-film-gora": localPair("tr-film-gora"),
+  "tr-film-arog": localPair("tr-film-arog"),
+  "tr-film-arif-v-216": localPair("tr-film-arif-v-216"),
+  "tr-film-vizontele": localPair("tr-film-vizontele"),
+  "tr-film-vizontele-tuuba": localPair("tr-film-vizontele-tuuba"),
+  "tr-film-babam-ve-oglum": localPair("tr-film-babam-ve-oglum"),
+  "tr-film-ayla": localPair("tr-film-ayla"),
+  "tr-film-7-kogustaki-mucize": localPair("tr-film-7-kogustaki-mucize"),
+  "tr-film-nefes": localPair("tr-film-nefes"),
+  "tr-film-dag-2": localPair("tr-film-dag-2"),
+  "tr-film-organize-isler": localPair("tr-film-organize-isler"),
+  "tr-film-olumlu-dunya": localPair("tr-film-olumlu-dunya"),
+  "tr-film-olumlu-dunya-2": localPair("tr-film-olumlu-dunya-2"),
+  "tr-film-cinayet-susu": localPair("tr-film-cinayet-susu"),
+  "tr-film-hokkabaz": localPair("tr-film-hokkabaz", "svg"),
+  "tr-film-yahsi-bati": localPair("tr-film-yahsi-bati", "svg"),
+  "tr-film-dugun-dernek": localPair("tr-film-dugun-dernek", "svg"),
+  "movie-interstellar": localPair("movie-interstellar"),
+  "movie-inception": localPair("movie-inception"),
+  "movie-the-dark-knight": localPair("movie-the-dark-knight"),
+  "movie-gladiator": localPair("movie-gladiator"),
+  "movie-the-matrix": localPair("movie-the-matrix"),
+  "movie-the-shawshank-redemption": localPair("movie-the-shawshank-redemption"),
+  "movie-the-general": localPair("movie-the-general"),
+  "movie-nosferatu": localPair("movie-nosferatu"),
+  "movie-the-stranger": localPair("movie-the-stranger"),
+  "movie-carnival-souls": localPair("movie-carnival-souls"),
+  "movie-his-girl-friday": localPair("movie-his-girl-friday"),
+  "movie-sherlock-holmes": localPair("movie-sherlock-holmes"),
+  "movie-scarlet-street": localPair("movie-scarlet-street"),
+  "movie-detour": localPair("movie-detour"),
+  "movie-haunted-hill": localPair("movie-haunted-hill"),
+  "movie-cyrano": localPair("movie-cyrano"),
+  "movie-39-steps": localPair("movie-39-steps"),
+  "movie-sintel-fantasy": localPair("movie-sintel-fantasy"),
+  "movie-big-buck-bunny": localPair("movie-big-buck-bunny"),
+  "movie-little-shop": localPair("movie-little-shop", "svg"),
+  "movie-popeye-sindbad": localPair("movie-popeye-sindbad", "svg"),
+  "movie-atomic-brain": localPair("movie-atomic-brain", "svg"),
 };
+
+function normalizeTr(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/ğ/g, "g")
+    .replace(/ü/g, "u")
+    .replace(/ş/g, "s")
+    .replace(/ı/g, "i")
+    .replace(/İ/g, "i")
+    .replace(/ö/g, "o")
+    .replace(/ç/g, "c")
+    .trim();
+}
 
 /**
  * Returns authentic verified poster and backdrop if available for id or title match
  */
 export function getContentPoster(id: string, title?: string): { poster: string; backdrop: string } | null {
+  const cleanId = id.replace(/^custom-/, "");
   if (VERIFIED_POSTERS[id]) {
     return VERIFIED_POSTERS[id];
   }
+  if (VERIFIED_POSTERS[cleanId]) {
+    return VERIFIED_POSTERS[cleanId];
+  }
 
-  // Fallback title regex matcher
-  const t = (title || "").toLowerCase();
+  // Fallback title regex matcher with Turkish diacritic normalization & platform prefixes
+  const t = normalizeTr(title || "");
+  if (!t) return null;
   for (const [key, val] of Object.entries(VERIFIED_POSTERS)) {
-    const cleanKey = key.replace(/^(tr-dizi-|series-|tr-film-|movie-|world-dizi-)/, "").replace(/-/g, " ");
-    if (t.includes(cleanKey)) {
+    const cleanKey = normalizeTr(
+      key
+        .replace(/^(tr-dizi-|world-dizi-|series-netflix-|series-hbo-|series-tabii-|series-blutv-|series-disney-|series-gain-|series-|tr-film-|movie-)/, "")
+        .replace(/-/g, " ")
+    );
+    if (cleanKey && t.includes(cleanKey)) {
       return val;
     }
   }

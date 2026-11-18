@@ -1,97 +1,128 @@
 /**
- * Official and verified logo directory for Turkish TV channels
- * Maps messy titles, technical suffixes, or missing posters to verified transparent channel logos.
+ * Official and verified local logo directory for Turkish TV channels.
+ * All core channels map to locally served crisp 3D SVG logos under `/assets/channel-logos/*.svg`
+ * for 100% 200 OK offline/online reliability without external CDN breakage.
  */
 
 const VERIFIED_LOGOS: { match: RegExp; logo: string }[] = [
   // 1. National Mainstream Top Channels
-  { match: /^trt\s*1\b/i, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/TRT_1_logo_%282021-%29.svg/960px-TRT_1_logo_%282021-%29.svg.png" },
-  { match: /^atv\b/i, logo: "https://i.imgur.com/HyVUwFC.png" },
-  { match: /^kanal\s*d\b/i, logo: "https://i.imgur.com/9o1atM6.png" },
-  { match: /^star(\s*tv)?\b/i, logo: "https://i.imgur.com/9O3DHRB.png" },
-  { match: /^show(\s*tv)?\b/i, logo: "https://i.imgur.com/1l7SCCu.png" },
-  { match: /^beyaz(\s*tv)?\b/i, logo: "https://i.imgur.com/uykIdML.png" },
-  { match: /^tv8(\.5|\s*hd)?$/i, logo: "https://upload.wikimedia.org/wikipedia/tr/thumb/6/68/Tv8_Yeni_Logo.png/960px-Tv8_Yeni_Logo.png" },
-  { match: /^(now|fox)(\s*tv)?\b/i, logo: "https://i.imgur.com/5EYjWK7.png" },
-  { match: /^kanal\s*7\b/i, logo: "https://i.imgur.com/0gq9xOm.png" },
+  { match: /^trt\s*1\b/i, logo: "/assets/channel-logos/trt-1.svg" },
+  { match: /^atv(\s|$)/i, logo: "/assets/channel-logos/atv.svg" },
+  { match: /^kanal\s*d\b/i, logo: "/assets/channel-logos/kanal-d.svg" },
+  { match: /^euro\s*d\b/i, logo: "/assets/channel-logos/kanal-d.svg" },
+  { match: /^star(\s*tv)?\b/i, logo: "/assets/channel-logos/star-tv.svg" },
+  { match: /^show(\s*tv|\s*türk)?\b/i, logo: "/assets/channel-logos/show-tv.svg" },
+  { match: /^beyaz(\s*tv)?\b/i, logo: "/assets/channel-logos/beyaz-tv.svg" },
+  { match: /^tv\s*8\.5\b/i, logo: "/assets/channel-logos/tv85.svg" },
+  { match: /^tv\s*8(\s*hd|\s*int|\b)/i, logo: "/assets/channel-logos/tv8.svg" },
+  { match: /^(now|fox)(\s*tv)?\b/i, logo: "/assets/channel-logos/now-tv.svg" },
+  { match: /^kanal\s*7\b/i, logo: "/assets/channel-logos/kanal-7.svg" },
 
   // 2. TRT Family
-  { match: /^trt\s*2\b/i, logo: "https://i.imgur.com/iOCQdyD.png" },
-  { match: /^trt\s*haber\b/i, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/TRT_Haber_Eyl%C3%BCl_2020_Logo.svg/960px-TRT_Haber_Eyl%C3%BCl_2020_Logo.svg.png" },
-  { match: /^trt\s*spor(\s*yıldız)?\b/i, logo: "https://i.imgur.com/6tv0zxh.png" },
-  { match: /^trt\s*çocuk\b/i, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/TRT_%C3%87ocuk_logo_%282021%29.svg/960px-TRT_%C3%87ocuk_logo_%282021%29.svg.png" },
-  { match: /^trt\s*belgesel\b/i, logo: "https://upload.wikimedia.org/wikipedia/tr/thumb/3/30/TRT_Belgesel_logo_%282020%29.svg/960px-TRT_Belgesel_logo_%282020%29.svg.png" },
-  { match: /^trt\s*müzik\b/i, logo: "https://upload.wikimedia.org/wikipedia/tr/thumb/f/f6/TRT_M%C3%BCzik_logosu_%282021%29.svg/960px-TRT_M%C3%BCzik_logosu_%282021%29.svg.png" },
-  { match: /^trt\s*türk\b/i, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/TRT_T%C3%BCrk_logo_%282021%29.svg/960px-TRT_T%C3%BCrk_logo_%282021%29.svg.png" },
-  { match: /^trt\s*avaz\b/i, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/TRT_Avaz_logo_%282021%29.svg/960px-TRT_Avaz_logo_%282021%29.svg.png" },
-  { match: /^trt\s*diyanet\b/i, logo: "https://upload.wikimedia.org/wikipedia/tr/thumb/4/4e/Diyanet_TV_logosu.png/800px-Diyanet_TV_logosu.png" },
-  { match: /^trt\s*world\b/i, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/TRT_World_logo.svg/960px-TRT_World_logo.svg.png" },
-  { match: /^trt\s*arabi\b/i, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/TRT_Arabi_logo_%282021%29.svg/960px-TRT_Arabi_logo_%282021%29.svg.png" },
+  { match: /^trt\s*2\b/i, logo: "/assets/channel-logos/trt-2.svg" },
+  { match: /^trt\s*haber\b/i, logo: "/assets/channel-logos/trt-haber.svg" },
+  { match: /^trt\s*spor\s*(yıldız|yildiz|2)\b/i, logo: "/assets/channel-logos/trt-spor-yildiz.svg" },
+  { match: /^trt\s*spor\b/i, logo: "/assets/channel-logos/trt-spor.svg" },
+  { match: /^trt\s*(çocuk|cocuk)\s*diyanet\b/i, logo: "/assets/channel-logos/trt-diyanet.svg" },
+  { match: /^trt\s*(çocuk|cocuk)\b/i, logo: "/assets/channel-logos/trt-cocuk.svg" },
+  { match: /^trt\s*diyanet(\s*(çocuk|cocuk))?\b/i, logo: "/assets/channel-logos/trt-diyanet.svg" },
+  { match: /^diyanet\s*tv\b/i, logo: "/assets/channel-logos/trt-diyanet.svg" },
+  { match: /^trt\s*belgesel\b/i, logo: "/assets/channel-logos/trt-belgesel.svg" },
+  { match: /^trt\s*(müzik|muzik)\b/i, logo: "/assets/channel-logos/trt-muzik.svg" },
+  { match: /^trt\s*(türk|turk)\b/i, logo: "/assets/channel-logos/trt-turk.svg" },
+  { match: /^trt\s*avaz\b/i, logo: "/assets/channel-logos/trt-avaz.svg" },
+  { match: /^trt\s*world\b/i, logo: "/assets/channel-logos/trt-world.svg" },
+  { match: /^trt\s*arabi\b/i, logo: "/assets/channel-logos/trt-arabi.svg" },
 
-  // 3. News Channels
-  { match: /^ntv\b/i, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/NTV_%28Turkey%29_logo.svg/960px-NTV_%28Turkey%29_logo.svg.png" },
-  { match: /^haber\s*türk\b/i, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Habert%C3%BCrk_TV_logosu.svg/800px-Habert%C3%BCrk_TV_logosu.svg.png" },
-  { match: /^cnn\s*türk\b/i, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/CNN_T%C3%BCrk_logo.svg/960px-CNN_T%C3%BCrk_logo.svg.png" },
-  { match: /^(sözcü|szc)\b/i, logo: "https://i.imgur.com/BxpdvsG.png" },
-  { match: /^halk\s*tv\b/i, logo: "https://i.imgur.com/xM0HA30.png" },
-  { match: /^tele1\b/i, logo: "https://upload.wikimedia.org/wikipedia/tr/4/43/Tele1_logosu.png" },
-  { match: /^tv100\b/i, logo: "https://i.imgur.com/yUvdP8x.png" },
-  { match: /^haber\s*global\b/i, logo: "https://i.imgur.com/m2Uqg3M.png" },
-  { match: /^a\s*haber\b/i, logo: "https://upload.wikimedia.org/wikipedia/commons/7/7c/Ahaber_Logo.png" },
-  { match: /^tgrt\s*haber\b/i, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Tgrthaber_yenilogo.png/800px-Tgrthaber_yenilogo.png" },
-  { match: /^24(\s*tv)?\b/i, logo: "https://i.imgur.com/8FO41es.png" },
-  { match: /^360\b/i, logo: "https://i.imgur.com/agn47sQ.png" },
-  { match: /^bengü\s*türk\b/i, logo: "https://i.imgur.com/4Wz95Nf.png" },
-  { match: /^flash\s*haber\b/i, logo: "https://i.imgur.com/rP3JqRz.png" },
-  { match: /^ekotürk\b/i, logo: "https://i.imgur.com/eBkWQvK.png" },
-  { match: /^bloomberg\s*ht\b/i, logo: "https://upload.wikimedia.org/wikipedia/tr/thumb/d/d4/Bloomberg_HT_logo.png/800px-Bloomberg_HT_logo.png" },
-  { match: /^ülke\s*tv\b/i, logo: "https://i.imgur.com/PZt1j4Q.png" },
-  { match: /^a\s*para\b/i, logo: "https://i.imgur.com/GjHnq0c.png" },
+  // 3. News & Economy Channels
+  { match: /^ntv\b/i, logo: "/assets/channel-logos/ntv.svg" },
+  { match: /^(haber\s*türk|haberturk)\b/i, logo: "/assets/channel-logos/haberturk.svg" },
+  { match: /^cnn\s*(türk|turk)\b/i, logo: "/assets/channel-logos/cnn-turk.svg" },
+  { match: /^(sözcü|sozcu|szc)\b/i, logo: "/assets/channel-logos/sozcu.svg" },
+  { match: /^halk\s*tv\b/i, logo: "/assets/channel-logos/halk-tv.svg" },
+  { match: /^tele\s*1\b/i, logo: "/assets/channel-logos/tele1.svg" },
+  { match: /^tv\s*100\b/i, logo: "/assets/channel-logos/tv100.svg" },
+  { match: /^haber\s*global\b/i, logo: "/assets/channel-logos/haber-global.svg" },
+  { match: /^a\s*haber\b/i, logo: "/assets/channel-logos/a-haber.svg" },
+  { match: /^tgrt\b/i, logo: "/assets/channel-logos/tgrt-haber.svg" },
+  { match: /^(tv\s*24|24(\s*tv)?)\b/i, logo: "/assets/channel-logos/tv24.svg" },
+  { match: /^(tv\s*360|360(\s*tv)?)\b/i, logo: "/assets/channel-logos/tv360.svg" },
+  { match: /^(bengü\s*türk|benguturk)\b/i, logo: "/assets/channel-logos/bengu-turk.svg" },
+  { match: /^flash\b/i, logo: "/assets/channel-logos/flash-haber.svg" },
+  { match: /^(ekotürk|ekoturk)\b/i, logo: "/assets/channel-logos/ekoturk.svg" },
+  { match: /^bloomberg\s*ht\b/i, logo: "/assets/channel-logos/bloomberg-ht.svg" },
+  { match: /^(ülke|ulke)\s*tv\b/i, logo: "/assets/channel-logos/ulke-tv.svg" },
+  { match: /^a\s*para\b/i, logo: "/assets/channel-logos/a-para.svg" },
 
   // 4. Entertainment & Thematic
-  { match: /^teve2\b/i, logo: "https://upload.wikimedia.org/wikipedia/tr/thumb/8/87/Teve2_logo.png/500px-Teve2_logo.png" },
-  { match: /^a2(\s*tv)?\b/i, logo: "https://iatv.tmgrup.com.tr/site/v2/a2tv/i/a2tv-logo.png" },
-  { match: /^tlc\b/i, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/TLC_Logo_2016.svg/800px-TLC_Logo_2016.svg.png" },
-  { match: /^dmax\b/i, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/DMAX_2016_logo.svg/800px-DMAX_2016_logo.svg.png" },
+  { match: /^teve\s*2\b/i, logo: "/assets/channel-logos/teve2.svg" },
+  { match: /^a2(\s*tv)?\b/i, logo: "/assets/channel-logos/a2.svg" },
+  { match: /^tlc\b/i, logo: "/assets/channel-logos/tlc.svg" },
+  { match: /^dmax\b/i, logo: "/assets/channel-logos/dmax.svg" },
+  { match: /^cnbc-?e\b/i, logo: "/assets/channel-logos/cnbc-e.svg" },
+  { match: /^semerkand\b/i, logo: "/assets/channel-logos/semerkand.svg" },
+  { match: /^dost(\s*tv)?\b/i, logo: "/assets/channel-logos/dost-tv.svg" },
 
   // 5. Sports
-  { match: /^a\s*spor\b/i, logo: "https://i.imgur.com/ZhkZzLf.png" },
-  { match: /^tivibu\s*spor\b/i, logo: "https://i.imgur.com/qvrKQY3.png" },
-  { match: /^s\s*sport(\s*2)?\b/i, logo: "https://i.imgur.com/bW3JjVb.png" },
-  { match: /^fb\s*tv\b/i, logo: "https://upload.wikimedia.org/wikipedia/tr/thumb/b/b3/FBTV_Logo.png/800px-FBTV_Logo.png" },
-  { match: /^gs\s*tv\b/i, logo: "https://upload.wikimedia.org/wikipedia/tr/thumb/1/14/Galatasaray_TV_logo.png/800px-Galatasaray_TV_logo.png" },
-  { match: /^bjk\s*tv\b/i, logo: "https://upload.wikimedia.org/wikipedia/tr/thumb/1/1a/BJK_TV.png/800px-BJK_TV.png" },
-  { match: /^sports\s*tv\b/i, logo: "https://i.imgur.com/L1M4r7n.png" },
+  { match: /^a\s*spor\b/i, logo: "/assets/channel-logos/a-spor.svg" },
+  { match: /^ht\s*spor\b/i, logo: "/assets/channel-logos/ht-spor.svg" },
+  { match: /^tivibu\s*spor\b/i, logo: "/assets/channel-logos/tivibu-spor.svg" },
+  { match: /^s\s*sport(\s*2)?\b/i, logo: "/assets/channel-logos/s-sport.svg" },
+  { match: /^fb\s*tv\b/i, logo: "/assets/channel-logos/fb-tv.svg" },
+  { match: /^gs\s*tv\b/i, logo: "/assets/channel-logos/gs-tv.svg" },
+  { match: /^bjk\s*tv\b/i, logo: "/assets/channel-logos/bjk-tv.svg" },
+  { match: /^sports\s*tv\b/i, logo: "/assets/channel-logos/sports-tv.svg" },
+  { match: /^tjk\s*tv\b/i, logo: "/assets/channel-logos/tjk-tv.svg" },
 
   // 6. Music
-  { match: /^power\s*türk\b/i, logo: "https://i.imgur.com/9OPoXQG.png" },
-  { match: /^kral(\s*tv|\s*pop)?\b/i, logo: "https://i.imgur.com/GeEDOPN.png" },
-  { match: /^(number\s*one|nr1)(\s*türk)?\b/i, logo: "https://i.imgur.com/0Q4E5qZ.png" },
-  { match: /^dream(\s*tv|\s*türk)?\b/i, logo: "https://upload.wikimedia.org/wikipedia/tr/thumb/f/f6/Dream_TV_logosu.png/800px-Dream_TV_logosu.png" },
+  { match: /^power\s*türk|^power\s*turk/i, logo: "/assets/channel-logos/powerturk.svg" },
+  { match: /^power\s*(tv|love|dance)\b/i, logo: "/assets/channel-logos/power-tv.svg" },
+  { match: /^kral(\s*tv|\s*pop)?\b/i, logo: "/assets/channel-logos/kral-tv.svg" },
+  { match: /^(number\s*one|nr1)\b/i, logo: "/assets/channel-logos/nr1.svg" },
+  { match: /^dream(\s*tv|\s*türk|\s*turk)?\b/i, logo: "/assets/channel-logos/dream-turk.svg" },
 
   // 7. Kids
-  { match: /^minika\s*çocuk\b/i, logo: "https://upload.wikimedia.org/wikipedia/tr/thumb/e/ee/Minika_%C3%87ocuk_Logo.png/800px-Minika_%C3%87ocuk_Logo.png" },
-  { match: /^minika\s*go\b/i, logo: "https://upload.wikimedia.org/wikipedia/tr/thumb/a/ad/Minika_GO_Logo.png/800px-Minika_GO_Logo.png" },
-  { match: /^cartoon\s*network\b/i, logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Cartoon_Network_2010_logo.svg/800px-Cartoon_Network_2010_logo.svg.png" },
+  { match: /^minika\s*(çocuk|cocuk)\b/i, logo: "/assets/channel-logos/minika-cocuk.svg" },
+  { match: /^minika\s*go\b/i, logo: "/assets/channel-logos/minika-go.svg" },
+  { match: /^cartoon\s*network\b/i, logo: "/assets/channel-logos/cartoon-network.svg" },
+  { match: /^zarok\b/i, logo: "/assets/channel-logos/zarok-tv.svg" },
+];
+
+const BROKEN_LOGO_DOMAINS = [
+  "unsplash.com",
+  "picsum.photos",
+  "hostux.pics",
+  "gia.tv",
+  "tmsimg.com",
+  "jiotv",
+  "imgur.com",
+  "wikimedia.org",
 ];
 
 /**
- * Returns a verified, high-resolution official channel logo if available.
- * If the existing poster is valid and not a generic Unsplash photo, preserves it.
+ * Returns a verified local channel logo if available, or filters out dead/broken external logo hosts
+ * so components render clean monogram badges instead of broken image icons.
  */
 export function getChannelLogo(channelTitle: string, existingPoster?: string | null): string | null {
   const t = (channelTitle || "").trim().toLowerCase();
 
-  // 1. Check verified national and thematic TV logos
+  // 1. Check verified national and thematic TV logos (all local 200 OK SVGs)
   for (const item of VERIFIED_LOGOS) {
     if (item.match.test(t)) {
       return item.logo;
     }
   }
 
-  // 2. If existing poster is an actual custom logo (not generic unsplash photo)
-  if (existingPoster && !existingPoster.includes("unsplash.com") && !existingPoster.includes("picsum.photos")) {
-    return existingPoster;
+  // 2. Keep valid existing poster only if it is NOT a known dead/generic image host or "NONE"
+  if (existingPoster) {
+    const lower = existingPoster.trim().toLowerCase();
+    if (
+      lower &&
+      lower !== "none" &&
+      !BROKEN_LOGO_DOMAINS.some((d) => lower.includes(d))
+    ) {
+      return existingPoster;
+    }
   }
 
   return null;

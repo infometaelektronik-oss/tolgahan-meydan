@@ -1,14 +1,19 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
 import { loadStore } from "@/db/native-db";
 
-test("Movie integrity: Every movie has a unique, dedicated stream URL", () => {
+test("Movie integrity: Every movie has a unique non-trailer stream URL and valid local poster", () => {
   const store = loadStore();
   const movies = store.user_streams.filter((s) => s.category === "Movies");
-  assert.ok(movies.length >= 25, "Expected at least 25 movies");
+  assert.ok(movies.length >= 40, `Expected at least 40 movies, got ${movies.length}`);
 
   const urlMap = new Map<string, string[]>();
+  const snippetRe = /fragman|trailer|teaser|\bkesit\b|\bklip\b/i;
+
   for (const m of movies) {
+    assert.ok(!snippetRe.test(m.title), `Trailer/snippet leaked into Movies: ${m.title}`);
     if (!urlMap.has(m.source_url)) urlMap.set(m.source_url, []);
     urlMap.get(m.source_url)!.push(m.title);
   }
@@ -30,42 +35,85 @@ test("Movie integrity: Every movie has a unique, dedicated stream URL", () => {
     nefes.source_url,
     "Süt Kardeşler and Nefes Vatan Sağolsun must NOT share the same URL"
   );
+
+  // Foreign Cinema uses direct Archive.org MP4 streams (no geo/embed blocked YouTube links)
+  const foreignMovies = movies.filter((m) => m.is_foreign);
+  assert.ok(foreignMovies.length >= 15, `Expected at least 15 foreign movies, got ${foreignMovies.length}`);
+  for (const fm of foreignMovies) {
+    assert.ok(
+      fm.source_url.includes("archive.org/download/") && fm.source_url.endsWith(".mp4"),
+      `Foreign movie ${fm.title} should use verified Archive.org MP4, got ${fm.source_url}`
+    );
+  }
 });
 
-test("Live TV integrity: Turkish channels do not contain misclassified foreign channels", () => {
+test("Live TV integrity: No misclassified foreign channels, no foreign Spor leaks, and no dead image hosts", () => {
   const store = loadStore();
-  const turkishLive = store.user_streams.filter(
-    (s) => s.category === "Live TV" && !s.is_foreign && s.sub_category === "Ulusal"
-  );
+  const live = store.user_streams.filter((s) => s.category === "Live TV");
+  const turkishNational = live.filter((s) => !s.is_foreign && s.sub_category === "Ulusal");
 
   const foreignRegex = /star\s*(international|cinema|sinema|world)|pluto|cinemax|fox\s*(life|live\s*now)/i;
-  for (const ch of turkishLive) {
+  for (const ch of turkishNational) {
     assert.ok(
       !foreignRegex.test(ch.title),
       `Foreign channel "${ch.title}" found in Turkish national TV`
     );
   }
+
+  const foreignSporLeaks = live.filter((s) => s.is_foreign && s.sub_category === "Spor");
+  assert.equal(foreignSporLeaks.length, 0, "Foreign Live TV must not remain under TR 'Spor' sub_category");
+
+  const seenIds = new Set<string>();
+  const dupIds: string[] = [];
+  for (const item of store.user_streams) {
+    if (seenIds.has(item.id)) dupIds.push(item.id);
+    seenIds.add(item.id);
+  }
+  assert.equal(dupIds.length, 0, `Duplicate stream IDs found: ${JSON.stringify(dupIds)}`);
+
+  const deadHostRe = /unsplash\.com|picsum\.photos|hostux\.net|gia\.tv|tmsimg\.com|jiotv\.com/i;
+  for (const item of store.user_streams) {
+    for (const url of [item.poster_url, item.logo_url, item.backdrop_url]) {
+      if (url) {
+        assert.ok(!deadHostRe.test(url), `Dead/external placeholder host in ${item.id}: ${url}`);
+      }
+    }
+  }
 });
 
-test("Home rows integrity: Netflix, HBO, and Tabii platform rows exist", () => {
+test("Radio integrity: Clean audio stations only (no Italian visual TV streams) with local logos on disk", () => {
+  const store = loadStore();
+  const radios = store.user_streams.filter((s) => s.category === "Radio");
+  assert.ok(radios.length >= 30, `Expected at least 30 verified radios, got ${radios.length}`);
+
+  for (const r of radios) {
+    assert.notEqual(r.sub_category, "Yabancı TV", `Visual TV channel leaked into Radio: ${r.title}`);
+    assert.ok(!/rds\s*social|radiokisskiss\.tv|deejay\.it\/tv/i.test(r.title), `Visual TV stream leaked into Radio: ${r.title}`);
+    const logo = r.logo_url || r.poster_url;
+    assert.ok(logo && logo.startsWith("/assets/radio-logos/"), `Radio ${r.title} must use local radio logo, got ${logo}`);
+    const absPath = path.join(process.cwd(), "public", logo.replace(/^\//, ""));
+    assert.ok(fs.existsSync(absPath), `Radio logo missing on disk: ${absPath}`);
+  }
+});
+
+test("Home rows integrity: Clean 6 digital platform titles without unwanted suffix words", () => {
   const store = loadStore();
   const rowTitles = store.home_rows.map((r) => r.title);
-  assert.ok(rowTitles.some((t) => t.includes("Netflix")), "Netflix home row must exist");
-  assert.ok(rowTitles.some((t) => t.includes("HBO")), "HBO home row must exist");
-  assert.ok(rowTitles.some((t) => t.includes("Tabii")), "Tabii home row must exist");
+  for (const expected of ["Netflix", "HBO Max", "Tabii TV", "BluTV", "Disney+", "Gain"]) {
+    assert.ok(rowTitles.includes(expected), `Expected exact home row title "${expected}", got ${JSON.stringify(rowTitles)}`);
+  }
+  const forbiddenRe = /başyapıtlar|orijinal yapımlar|orijinal dizileri|paralı yayınlar/i;
+  for (const title of rowTitles) {
+    assert.ok(!forbiddenRe.test(title), `Forbidden label phrase found in home row title: ${title}`);
+  }
 });
 
-test("Turkish Channel Logos: Top national channels resolve to verified high-res logos", async () => {
+test("Turkish Channel Logos: Top national channels resolve to local verified SVGs on disk", async () => {
   const { getChannelLogo } = await import("./turkishChannelLogos");
-  assert.ok(getChannelLogo("TRT 1 HD"), "TRT 1 should have verified logo");
-  assert.ok(getChannelLogo("ATV"), "ATV should have verified logo");
-  assert.ok(getChannelLogo("Kanal D"), "Kanal D should have verified logo");
-  assert.ok(getChannelLogo("Star TV"), "Star TV should have verified logo");
-  assert.ok(getChannelLogo("Show TV"), "Show TV should have verified logo");
-  assert.ok(getChannelLogo("Beyaz TV"), "Beyaz TV should have verified logo");
-  assert.ok(getChannelLogo("TV8"), "TV8 should have verified logo");
-  assert.ok(getChannelLogo("NOW TV"), "NOW TV should have verified logo");
-  assert.ok(getChannelLogo("Kanal 7"), "Kanal 7 should have verified logo");
-  assert.ok(getChannelLogo("FOX TV"), "FOX TV should resolve to NOW logo");
+  for (const name of ["TRT 1 HD", "ATV", "Kanal D", "Star TV", "Show TV", "Beyaz TV", "TV8", "NOW TV", "Kanal 7", "FOX TV"]) {
+    const logo = getChannelLogo(name);
+    assert.ok(logo && logo.startsWith("/assets/channel-logos/"), `Expected local SVG logo for ${name}, got ${logo}`);
+    const absPath = path.join(process.cwd(), "public", logo.replace(/^\//, ""));
+    assert.ok(fs.existsSync(absPath), `Channel logo SVG missing on disk: ${absPath}`);
+  }
 });
-

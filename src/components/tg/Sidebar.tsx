@@ -102,6 +102,8 @@ export const Sidebar = forwardRef<HTMLElement, Props>(function Sidebar(
               return (
                 <button
                   key={it.id}
+                  aria-label={it.label}
+                  title={it.label}
                   ref={(el) => {
                     if (desktopNav) registerRef(`nav-${idx}`, el);
                   }}

@@ -26,6 +26,17 @@ export type Media = {
   backupUrls?: string[];
   cast?: string[];
   isLive?: boolean;
+  liveOffsetSeconds?: number;
+  channelId?: string;
+  liveSlotStartAt?: string;
+  liveSlotEndAt?: string;
+  isBreak?: boolean;
+  breakTrailers?: Array<{
+    title: string;
+    streamUrl: string;
+    posterUrl?: string;
+    durationSeconds: number;
+  }>;
 };
 
 export type Channel = {
@@ -45,9 +56,19 @@ export type ScheduleEntry = {
 
 export const GENRES = [
   "Tümü",
+  "Film",
+  "Dizi",
   "Dram",
   "Komedi",
   "Aksiyon",
+  "Bilim Kurgu",
+  "Macera",
+  "Gerilim",
+  "Suç",
+  "Korku",
+  "Fantastik",
+  "Animasyon",
+  "Gizem",
   "Romantik",
   "Tarih",
   "Polisiye",

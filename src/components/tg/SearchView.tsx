@@ -51,13 +51,18 @@ export function SearchView({
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q && genre === "Tümü") return [];
+    const gLower = genre.toLowerCase();
     return all.filter((m) => {
-      const matchesQ =
-        !q ||
-        m.title.toLowerCase().includes(q) ||
-        m.genre.toLowerCase().includes(q) ||
-        m.description.toLowerCase().includes(q);
-      const matchesG = genre === "Tümü" || m.genres.includes(genre) || (m.subCategory || "") === genre;
+      const hay = [m.title, m.genre, ...(m.genres || []), m.subCategory || "", m.description || ""]
+        .join(" ")
+        .toLowerCase();
+      const matchesQ = !q || hay.includes(q);
+      const matchesG =
+        genre === "Tümü" ||
+        m.genre.toLowerCase() === gLower ||
+        m.genres.some((g) => g.toLowerCase().includes(gLower)) ||
+        (m.subCategory || "").toLowerCase().includes(gLower) ||
+        (m.description || "").toLowerCase().includes(gLower);
       return matchesQ && matchesG;
     });
   }, [all, query, genre]);
@@ -97,16 +102,16 @@ export function SearchView({
 
   return (
     <div className="space-y-6 pb-12">
-      {/* VIP Cyber Search Banner Bar (High legibility, large fonts, themed styling) */}
+      {/* VIP Cyber Search Banner Bar with Integrated Search Input */}
       <div className="rounded-3xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950/70 via-teal-950/50 to-black p-6 shadow-2xl backdrop-blur-xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-[0_0_20px_rgba(52,211,153,0.6)] shrink-0">
-              <Search className="h-6 w-6 text-black" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-[0_0_20px_rgba(52,211,153,0.6)] shrink-0 border border-emerald-300/40">
+              <Search className="h-6 w-6 text-black stroke-[2.5]" />
             </div>
             <div>
               <div className="flex items-center gap-2.5">
-                <h1 className="text-xl font-black text-white sm:text-2xl md:text-3xl tracking-tight">
+                <h1 className="text-xl font-black text-white sm:text-2xl md:text-3xl tracking-tight uppercase">
                   Akıllı İçerik Arama Motoru
                 </h1>
                 <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-black uppercase tracking-wider text-emerald-300 border border-emerald-500/40">
@@ -119,50 +124,47 @@ export function SearchView({
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Search bar with mic */}
-      <div className="flex items-center gap-4">
-        <div
-          className={`flex flex-1 items-center gap-3 rounded-2xl border-2 px-5 py-4 backdrop-blur transition ${
-            focusedKey === "search-input"
-              ? "neon-ring border-purple-500 bg-purple-500/10"
-              : "border-white/10 bg-white/5"
-          }`}
-        >
-          <Search className="h-6 w-6 text-purple-300" />
-          <input
-            ref={(el) => registerRef("search-input", el)}
-            data-focus-key="search-input"
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setVirtualQ(e.target.value);
-            }}
-            placeholder="Dizi, film veya tür ara… veya mikrofona bas"
-            className="w-full bg-transparent text-xl text-white placeholder:text-white/40 outline-none"
-          />
-          {speechSupported && (
-            <button
-              ref={(el) => registerRef("search-mic", el)}
-              data-focus-key="search-mic"
-              tabIndex={-1}
-              onClick={toggleVoice}
-              title={listening ? "Dinleme durduruluyor" : "Sesli ara"}
-              className={`flex h-12 w-12 items-center justify-center rounded-full transition ${
-                listening
-                  ? "badge-new-pulse text-white"
-                  : focusedKey === "search-mic"
-                    ? "neon-ring scale-105 bg-purple-600 text-white"
-                    : "bg-white/10 text-purple-200 hover:bg-purple-600/40 hover:text-white"
-              }`}
-            >
-              {listening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
-            </button>
-          )}
-          <span className="rounded-md bg-white/10 px-2 py-1 text-[10px] font-mono text-white/60">
-            {results.length} sonuç
-          </span>
+        {/* Integrated 3D Search Bar */}
+        <div className="mt-5 flex items-center gap-3">
+          <div
+            className={`flex flex-1 items-center gap-3 rounded-2xl border-2 px-5 py-3.5 backdrop-blur transition-all ${
+              focusedKey === "search-input"
+                ? "neon-ring border-emerald-400 bg-emerald-950/40 shadow-[0_0_20px_rgba(52,211,153,0.4)]"
+                : "border-white/15 bg-black/50 hover:border-white/30"
+            }`}
+          >
+            <Search className="h-6 w-6 text-emerald-400 shrink-0" />
+            <input
+              ref={(el) => registerRef("search-input", el)}
+              data-focus-key="search-input"
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setVirtualQ(e.target.value);
+              }}
+              placeholder="Dizi, film, kanal veya tür ara… (örn: Kurtlar Vadisi, GORA, TRT, Komedi)"
+              className="w-full bg-transparent text-lg md:text-xl font-semibold text-white placeholder:text-white/40 outline-none"
+            />
+            {speechSupported && (
+              <button
+                ref={(el) => registerRef("search-mic", el)}
+                data-focus-key="search-mic"
+                tabIndex={-1}
+                onClick={toggleVoice}
+                title={listening ? "Dinleme durduruluyor" : "Sesli ara"}
+                className={`flex h-11 w-11 items-center justify-center rounded-xl transition ${
+                  listening
+                    ? "badge-new-pulse text-white bg-red-600"
+                    : focusedKey === "search-mic"
+                      ? "neon-ring scale-105 bg-emerald-500 text-black"
+                      : "bg-white/10 text-emerald-200 hover:bg-emerald-600/40 hover:text-white"
+                }`}
+              >
+                {listening ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

@@ -1,6 +1,6 @@
-import { Play, Sparkles, Film, Tv, ShieldCheck } from "lucide-react";
+import { Play, Sparkles } from "lucide-react";
 
-export type PlatformId = "netflix" | "hbo" | "tabii" | "blutv" | "disney";
+export type PlatformId = "netflix" | "hbo" | "tabii" | "blutv" | "disney" | "gain";
 
 interface PlatformInfo {
   id: PlatformId;
@@ -20,7 +20,7 @@ const PLATFORMS: PlatformInfo[] = [
   {
     id: "netflix",
     name: "NETFLIX",
-    tagline: "Orijinal Dizi, Film & Küresel Yapımlar",
+    tagline: "Özel Dizi, Film & Küresel Yapımlar",
     badge: "4K ULTRA HD",
     badgeColor: "bg-red-600/30 text-red-300 border-red-500/40",
     bgGradient: "from-red-950/60 via-black to-neutral-950",
@@ -33,26 +33,26 @@ const PLATFORMS: PlatformInfo[] = [
   {
     id: "hbo",
     name: "HBO MAX",
-    tagline: "Ödüllü Başyapıtlar & Max Originals",
+    tagline: "Ödüllü Yapımlar & Max Serileri",
     badge: "PREMIUM",
     badgeColor: "bg-purple-600/30 text-purple-200 border-purple-500/40",
     bgGradient: "from-purple-950/60 via-black to-neutral-950",
     borderColor: "border-purple-600/40 hover:border-purple-500",
     glowColor: "shadow-[0_0_30px_rgba(168,85,247,0.3)]",
-    highlights: ["Game of Thrones", "House of the Dragon", "Chernobyl", "Succession"],
+    highlights: ["Game of Thrones", "House of the Dragon", "Chernobyl", "The Last of Us"],
     logoText: "HBO",
     logoColor: "text-purple-400 font-serif",
   },
   {
     id: "tabii",
     name: "TABİİ TV",
-    tagline: "TRT Dijital Platformu — Bizi Birleştiren Hikayeler",
-    badge: "YERLİ ORİJİNAL",
+    tagline: "TRT Dijital Platformu — Yerli Yapımlar",
+    badge: "YERLİ PLATFORM",
     badgeColor: "bg-emerald-600/30 text-emerald-200 border-emerald-500/40",
     bgGradient: "from-emerald-950/60 via-black to-neutral-950",
     borderColor: "border-emerald-600/40 hover:border-emerald-500",
     glowColor: "shadow-[0_0_30px_rgba(16,185,129,0.3)]",
-    highlights: ["Bozkır Arslanı", "Mevlânâ", "Adalet", "Şebeke", "Koyu Beyaz"],
+    highlights: ["Bozkır Arslanı", "Mevlânâ", "Adalet", "Şebeke"],
     logoText: "tabii",
     logoColor: "text-emerald-400 font-sans tracking-tighter",
   },
@@ -68,6 +68,32 @@ const PLATFORMS: PlatformInfo[] = [
     highlights: ["Magarsus", "Behzat Ç. Çekiç ve Gül", "Prens", "İlk ve Son"],
     logoText: "blu",
     logoColor: "text-cyan-400 font-sans lowercase",
+  },
+  {
+    id: "disney",
+    name: "DİSNEY+",
+    tagline: "Disney, Marvel, Star & Seçkin Yerli Diziler",
+    badge: "DİSNEY+",
+    badgeColor: "bg-blue-600/30 text-blue-200 border-blue-500/40",
+    bgGradient: "from-blue-950/65 via-slate-950 to-black",
+    borderColor: "border-blue-500/40 hover:border-blue-400",
+    glowColor: "shadow-[0_0_30px_rgba(59,130,246,0.35)]",
+    highlights: ["Aktris", "Kaçış", "Arayış", "Shōgun", "The Bear"],
+    logoText: "Disney+",
+    logoColor: "text-blue-400 font-sans tracking-tight",
+  },
+  {
+    id: "gain",
+    name: "GAİN",
+    tagline: "Özgün Komedi, Drama & Modern Türk Dizileri",
+    badge: "GAİN",
+    badgeColor: "bg-rose-600/30 text-rose-200 border-rose-500/40",
+    bgGradient: "from-rose-950/60 via-black to-neutral-950",
+    borderColor: "border-rose-500/40 hover:border-rose-400",
+    glowColor: "shadow-[0_0_30px_rgba(244,63,94,0.35)]",
+    highlights: ["Ayak İşleri", "10 Bin Adım", "Doğu", "Şahsiyet", "Ru"],
+    logoText: "GAİN",
+    logoColor: "text-rose-400 font-sans tracking-wider",
   },
 ];
 
@@ -87,19 +113,19 @@ export function PlatformHubs({ focusedKey, registerRef, onSelectPlatform }: Prop
           </div>
           <div>
             <h2 className="text-lg font-black tracking-tight text-white md:text-xl">
-              Dijital Platformlar & Paralı Yayınlar
+              Dijital Platformlar
             </h2>
             <p className="text-xs text-white/60">
-              Netflix, HBO, Tabii TV ve BluTV özel içeriklerine tek dokunuşla ulaşın.
+              Netflix, HBO Max, Tabii TV, BluTV, Disney+ ve Gain kataloglarına tek dokunuşla ulaşın.
             </p>
           </div>
         </div>
         <span className="hidden rounded-full border border-purple-500/30 bg-purple-950/40 px-3 py-1 text-[11px] font-bold text-purple-300 sm:inline-block">
-          VIP Platform Hub
+          {PLATFORMS.length} Platform
         </span>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {PLATFORMS.map((p, idx) => {
           const fk = `platform-hub-${idx}`;
           const isFocused = focusedKey === fk;
@@ -109,6 +135,7 @@ export function PlatformHubs({ focusedKey, registerRef, onSelectPlatform }: Prop
               key={p.id}
               ref={(el) => registerRef(fk, el)}
               data-focus-key={fk}
+              data-platform-id={p.id}
               tabIndex={-1}
               onClick={() => onSelectPlatform(p.id)}
               className={`group relative flex flex-col justify-between overflow-hidden rounded-3xl border bg-gradient-to-br p-5 text-left transition-all duration-300 active:scale-95 ${
@@ -122,11 +149,11 @@ export function PlatformHubs({ focusedKey, registerRef, onSelectPlatform }: Prop
 
               <div>
                 <div className="flex items-center justify-between gap-2">
-                  <div className={`text-2xl font-black tracking-wider ${p.logoColor}`}>
+                  <div className={`text-xl font-black tracking-wider ${p.logoColor}`}>
                     {p.logoText}
                   </div>
                   <span
-                    className={`rounded-full border px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider ${p.badgeColor}`}
+                    className={`rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${p.badgeColor}`}
                   >
                     {p.badge}
                   </span>

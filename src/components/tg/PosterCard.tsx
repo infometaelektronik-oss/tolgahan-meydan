@@ -35,12 +35,14 @@ export function PosterCard({
       }`}
     >
       <img
-        src={posterOverride || media.poster}
+        src={posterOverride || media.poster || "/assets/aistudio/Media_item_1_1bba30da.jpg"}
         alt={media.title}
         loading="lazy"
         onError={(e) => {
           const t = e.currentTarget;
-          if (posterOverride && t.src !== media.poster) t.src = media.poster;
+          if (!t.src.includes("/assets/aistudio/Media_item_1_1bba30da.jpg")) {
+            t.src = "/assets/aistudio/Media_item_1_1bba30da.jpg";
+          }
         }}
         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
       />

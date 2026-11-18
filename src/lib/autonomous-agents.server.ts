@@ -106,13 +106,9 @@ export async function runAutonomousAgentNetwork(): Promise<NetworkScanResult> {
       s.status = s.is_active ? "active" : "inactive";
       geminiFixes++;
     }
-    // Auto-heal empty posters if channel group is known
     if (!s.poster_url && !s.logo_url) {
-      if (s.category === "Movies") {
-        s.poster_url = "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&auto=format&fit=crop&q=80";
-        geminiFixes++;
-      } else if (s.category === "Series") {
-        s.poster_url = "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500&auto=format&fit=crop&q=80";
+      if (s.category === "Movies" || s.category === "Series") {
+        s.poster_url = "/assets/aistudio/Media_item_1_1bba30da.jpg";
         geminiFixes++;
       }
     }

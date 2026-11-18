@@ -55,18 +55,20 @@ export function HomeRows({ rows, focusedKey, registerRef, onPlay }: Props) {
                         isFocus ? "neon-ring scale-105 bg-purple-600/20" : "hover:bg-white/10"
                       }`}
                     >
-                      {s.logoUrl || s.posterUrl ? (
-                        <img
-                          loading="lazy"
-                          src={s.logoUrl || s.posterUrl}
-                          alt={s.title}
-                          className="h-14 w-14 rounded-xl object-contain"
-                        />
-                      ) : (
-                        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-fuchsia-700 text-2xl font-black">
-                          {s.title.slice(0, 1).toUpperCase()}
-                        </div>
-                      )}
+                      <div className="relative flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-fuchsia-700 text-2xl font-black text-white">
+                        <span>{s.title.slice(0, 1).toUpperCase()}</span>
+                        {(s.logoUrl || s.posterUrl) && (
+                          <img
+                            loading="lazy"
+                            src={s.logoUrl || s.posterUrl}
+                            alt={s.title}
+                            onError={(e) => {
+                              e.currentTarget.style.display = "none";
+                            }}
+                            className="absolute inset-0 h-14 w-14 rounded-xl bg-black/80 p-1 object-contain"
+                          />
+                        )}
+                      </div>
                       <div className="line-clamp-1 text-sm font-black text-white">{s.title}</div>
                       <span className="rounded-full bg-red-600/80 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-white">
                         Canlı

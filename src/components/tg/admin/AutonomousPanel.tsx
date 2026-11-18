@@ -604,7 +604,7 @@ export function AutonomousPanel({ onChanged }: { onChanged?: () => void }) {
                 type="button"
                 onClick={() => {
                   setCrawlRawText(
-                    `#EXTM3U\n#EXTINF:-1 tvg-logo="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600" group-title="Filmler",Hababam Sınıfı (Full HD)\nhttps://www.youtube.com/watch?v=hf2-8MRPGu8\n#EXTINF:-1 tvg-logo="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600" group-title="Filmler",Tosun Paşa (Full HD)\nhttps://www.youtube.com/watch?v=ZvXzoYwm-GU`
+                    `#EXTM3U\n#EXTINF:-1 tvg-logo="/assets/posters/tr-film-hababam-sinifi.jpg" group-title="Filmler",Hababam Sınıfı (Full HD)\nhttps://www.youtube.com/watch?v=hf2-8MRPGu8\n#EXTINF:-1 tvg-logo="/assets/posters/tr-film-tosun-pasa.jpg" group-title="Filmler",Tosun Paşa (Full HD)\nhttps://www.youtube.com/watch?v=ZvXzoYwm-GU`
                   );
                   setCrawlCategory("Movies");
                 }}

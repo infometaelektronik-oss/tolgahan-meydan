@@ -27,6 +27,7 @@ import type { Media } from "./data";
 import { proxiedStreamUrl } from "./v2-helpers";
 import { useServerFn } from "@tanstack/react-start";
 import { recordView } from "@/lib/engagement.functions";
+import { getTGTVCurrent, getTGTVLogo, getTGTVChannelAnimation } from "@/lib/tg-tv.functions";
 import { FavoriteButton } from "./FavoriteButton";
 
 type Props = {
@@ -48,7 +49,7 @@ function getYouTubeEmbedUrl(url?: string | null): string | null {
   if (!url) return null;
   const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
   if (match && match[1]) {
-    return `https://www.youtube.com/embed/${match[1]}?autoplay=1&playsinline=1&enablejsapi=1&rel=0&modestbranding=1`;
+    return `https://www.youtube.com/embed/${match[1]}?autoplay=1&playsinline=1&enablejsapi=1&rel=0&modestbranding=1&cc_load_policy=0&iv_load_policy=3`;
   }
   return null;
 }
@@ -99,12 +100,16 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
   const [currentHeight, setCurrentHeight] = useState<number | null>(null);
   const [switchNote, setSwitchNote] = useState<string | null>(null);
   const recordViewFn = useServerFn(recordView);
+  const getCurrentTGTVFn = useServerFn(getTGTVCurrent);
   const closeRef = useRef<HTMLButtonElement>(null);
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Stream Error & Retry State
   const [streamError, setStreamError] = useState<string | null>(null);
   const [retryKey, setRetryKey] = useState<number>(0);
+  const [ytSessionKey, setYtSessionKey] = useState<number>(0);
+  const ytStartAtRef = useRef<number>(0);
+  const hadCaptionsRef = useRef<boolean>(false);
 
   // 2. Adaptive Bitrate & Anti-Freeze State
   const [adaptiveBadge, setAdaptiveBadge] = useState<string | null>(null);
@@ -174,31 +179,109 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
   useEffect(() => {
     closeRef.current?.focus();
     pingUI();
-    const t = setTimeout(() => {
-      const el = containerRef.current;
-      if (el?.requestFullscreen && !document.fullscreenElement) {
-        el.requestFullscreen().catch(() => {});
-      }
-    }, 120);
     const onFsChange = () => setIsFs(Boolean(document.fullscreenElement));
     document.addEventListener("fullscreenchange", onFsChange);
     return () => {
-      clearTimeout(t);
       document.removeEventListener("fullscreenchange", onFsChange);
       if (hideTimer.current) clearTimeout(hideTimer.current);
       if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
     };
   }, [pingUI]);
 
-  // Keep UI visible while paused or while the resolution panel is open
+  // Keep UI visible while paused or while a control panel/modal is open
   useEffect(() => {
-    if (!playing || showRes) {
+    if (!playing || showRes || showLang || showSpeedModal) {
       setUiVisible(true);
       if (hideTimer.current) clearTimeout(hideTimer.current);
     } else {
       pingUI();
     }
-  }, [playing, showRes, pingUI]);
+  }, [playing, showRes, showLang, showSpeedModal, pingUI]);
+
+  // Reset transient stream state when switching to a new program or break trailer
+  useEffect(() => {
+    setOverrideSourceUrl(null);
+    setStreamError(null);
+    setSwitchNote(null);
+    setActiveSub(-1);
+    hadCaptionsRef.current = false;
+    ytStartAtRef.current = media.isLive && media.liveOffsetSeconds ? media.liveOffsetSeconds : 0;
+    setProgress(0);
+  }, [media.id, media.video, media.isLive, media.liveOffsetSeconds]);
+
+  // Automatic Linear Broadcast & 2-Minute Trailer Break Transition Timer
+  useEffect(() => {
+    if (!media.isLive || !media.channelId || !media.liveSlotEndAt || !onAutoNext) return;
+    let cancelled = false;
+    const nowMs = Date.now();
+    const endMs = new Date(media.liveSlotEndAt).getTime();
+
+    if (media.isBreak && media.breakTrailers && media.breakTrailers.length > 0 && media.liveSlotStartAt) {
+      const startMs = new Date(media.liveSlotStartAt).getTime();
+      const elapsedMs = Math.max(0, nowMs - startMs);
+      const stepIdx = Math.floor(elapsedMs / 30_000);
+      const nextStepIdx = stepIdx + 1;
+      const nextStepAtMs = startMs + nextStepIdx * 30_000;
+
+      if (nextStepIdx < media.breakTrailers.length && nextStepAtMs < endMs - 1000) {
+        const delayMs = Math.max(400, nextStepAtMs - nowMs + 150);
+        const timer = setTimeout(() => {
+          if (cancelled) return;
+          const tr = media.breakTrailers![nextStepIdx];
+          onAutoNext({
+            ...media,
+            id: `${media.channelId}-${media.liveSlotStartAt}-tr-${nextStepIdx}`,
+            seriesTitle: `Reklam & Fragman Kuşağı · ${tr.title}`,
+            description: `[${nextStepIdx + 1}/${media.breakTrailers!.length}] ${tr.title} — Sıradaki program az sonra yayında.`,
+            backdrop: tr.posterUrl || media.backdrop,
+            video: tr.streamUrl,
+            liveOffsetSeconds: 0,
+          });
+        }, delayMs);
+        return () => {
+          cancelled = true;
+          clearTimeout(timer);
+        };
+      }
+    }
+
+    const delayToEndMs = Math.max(500, endMs - nowMs + 250);
+    const endTimer = setTimeout(async () => {
+      if (cancelled) return;
+      try {
+        const nextBroadcast = await getCurrentTGTVFn({ data: { channelId: media.channelId! } });
+        if (cancelled || !nextBroadcast?.item) return;
+        const item = nextBroadcast.item;
+        onAutoNext({
+          ...media,
+          id: `${media.channelId}-${item.id}`,
+          title: nextBroadcast.channel.name,
+          seriesTitle: item.title,
+          description: item.description || nextBroadcast.channel.description,
+          backdrop: item.posterUrl || media.backdrop,
+          poster: getTGTVLogo(media.channelId),
+          video: item.streamUrl,
+          backupUrls: item.backupUrl
+            ? [item.backupUrl, nextBroadcast.channel.fallbackStreamUrl]
+            : [nextBroadcast.channel.fallbackStreamUrl],
+          isLive: true,
+          liveOffsetSeconds: nextBroadcast.offsetSeconds || 0,
+          channelId: media.channelId,
+          liveSlotStartAt: item.startAt,
+          liveSlotEndAt: item.endAt,
+          isBreak: Boolean(item.isBreak),
+          breakTrailers: item.breakTrailers,
+        });
+      } catch (err) {
+        console.warn("Live auto-transition fetch failed:", err);
+      }
+    }, delayToEndMs);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(endTimer);
+    };
+  }, [media, onAutoNext, getCurrentTGTVFn]);
 
   // Record a view for the trending algorithm (once per opened stream)
   useEffect(() => {
@@ -235,6 +318,7 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
       mountEl.appendChild(targetDiv);
 
       try {
+        const startSec = Math.floor(ytStartAtRef.current || 0);
         ytPlayerRef.current = new YT.Player(targetDiv, {
           videoId: ytVideoId,
           playerVars: {
@@ -246,11 +330,30 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
             disablekb: 1,
             fs: 0,
             iv_load_policy: 3,
+            cc_load_policy: 0,
+            ...(startSec > 0 ? { start: startSec } : {}),
           },
           events: {
             onReady: (e: any) => {
               if (destroyed) return;
               try {
+                // Ensure YouTube captions are disabled by default
+                try {
+                  e.target.unloadModule?.("captions");
+                  e.target.setOption?.("captions", "track", {});
+                } catch {}
+                // Provide internal subtitle toggle option for user
+                setSubTracks([{ id: 0, label: "Türkçe Altyazı (YouTube)" }]);
+                setActiveSub(-1);
+
+                // Resume at stored start offset or live offset
+                const targetOffset = ytStartAtRef.current || (media.isLive ? media.liveOffsetSeconds || 0 : 0);
+                if (targetOffset > 0) {
+                  try {
+                    e.target.seekTo(targetOffset, true);
+                  } catch {}
+                }
+
                 e.target.playVideo();
                 const d = e.target.getDuration();
                 if (d && !isNaN(d) && d > 0) setDuration(d);
@@ -266,14 +369,17 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
               if (destroyed) return;
               console.warn("YouTube player error event:", e.data);
               if (e.data === 101 || e.data === 150 || e.data === 100 || e.data === 2) {
-                // If legitimate backup URL available for this film/series, switch to it
-                const firstBackup = media.backupUrls?.[0];
-                if (firstBackup && firstBackup !== overrideSourceUrl) {
+                const backups = (media.backupUrls || []).filter((u) => Boolean(u) && u !== media.video);
+                const curIdx = overrideSourceUrl ? backups.indexOf(overrideSourceUrl) : -1;
+                const nextBackup = backups[curIdx + 1];
+                if (nextBackup) {
                   setStreamError("Kaynak güncelleniyor, yedek akışa geçiliyor...");
                   setTimeout(() => {
-                    setOverrideSourceUrl(firstBackup);
-                    setStreamError(null);
-                  }, 800);
+                    if (!destroyed) {
+                      setOverrideSourceUrl(nextBackup);
+                      setStreamError(null);
+                    }
+                  }, 600);
                 } else {
                   setStreamError("Bu yapım için video kaynağı geçici olarak yanıt vermedi. Lütfen 'Yeniden Dene' butonuna basın.");
                 }
@@ -328,14 +434,16 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
         ytMountRef.current.innerHTML = "";
       }
     };
-  }, [isYouTube, ytVideoId, retryKey]);
+  }, [isYouTube, ytVideoId, media.id, retryKey, ytSessionKey]);
 
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
     let hls: Hls | null = null;
     let disposed = false;
-    const resumeAt = { t: 0 };
+    const resumeAt = {
+      t: (media.isLive && media.liveOffsetSeconds && media.liveOffsetSeconds > 0) ? media.liveOffsetSeconds : 0,
+    };
     // Zero-buffer fallback chain: primary (or diagnostic failover) → backups, each tried direct then via proxy.
     const primaryUrl = activePlayableUrl || "";
     if (getYouTubeEmbedUrl(primaryUrl)) return;
@@ -592,6 +700,10 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
   }, [volume, muted]);
 
   const handleSkipBack = useCallback(() => {
+    if (media.isLive) {
+      setSwitchNote("Doğal Canlı Yayın Koruması: Canlı yayında geri sarma kilitlidir.");
+      return;
+    }
     const v = videoRef.current;
     const yt = ytPlayerRef.current;
     if (v) {
@@ -600,9 +712,13 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
       const cur = yt.getCurrentTime() || progress;
       yt.seekTo(Math.max(0, cur - 10), true);
     }
-  }, [progress]);
+  }, [media.isLive, progress]);
 
   const handleSkipForward = useCallback(() => {
+    if (media.isLive) {
+      setSwitchNote("Doğal Canlı Yayın Koruması: Canlı yayında ileri sarma kilitlidir.");
+      return;
+    }
     const v = videoRef.current;
     const yt = ytPlayerRef.current;
     if (v) {
@@ -611,9 +727,13 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
       const cur = yt.getCurrentTime() || progress;
       yt.seekTo(Math.min(duration || 10000, cur + 10), true);
     }
-  }, [duration, progress]);
+  }, [duration, media.isLive, progress]);
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (media.isLive) {
+      setSwitchNote("Doğal Canlı Yayın Koruması: Yayın akışında zaman atlama kilitlidir.");
+      return;
+    }
     const rect = e.currentTarget.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const ratio = Math.max(0, Math.min(1, clickX / rect.width));
@@ -635,7 +755,74 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
   };
   const pickSub = (id: number) => {
     const hls = hlsRef.current;
-    if (hls) hls.subtitleTrack = id;
+    if (hls) {
+      hls.subtitleTrack = id;
+      hls.subtitleDisplay = id !== -1;
+    }
+
+    if (videoRef.current?.textTracks) {
+      for (let i = 0; i < videoRef.current.textTracks.length; i++) {
+        videoRef.current.textTracks[i].mode = id === -1 ? "disabled" : "showing";
+      }
+    }
+
+    // Toggle YouTube captions via internal subtitle button
+    const yt = ytPlayerRef.current;
+    if (yt) {
+      if (id === -1) {
+        let curTime = progress;
+        try {
+          if (typeof yt.getCurrentTime === "function") {
+            const c = yt.getCurrentTime();
+            if (typeof c === "number" && !isNaN(c)) curTime = c;
+          }
+        } catch {}
+        try { yt.unloadModule?.("captions"); } catch {}
+        try { yt.setOption?.("captions", "track", {}); } catch {}
+        try { yt.setOption?.("captions", "reload", true); } catch {}
+        try { yt.setOption?.("cc", "track", {}); } catch {}
+
+        // Send postMessage command directly to YouTube iframe to force captions off
+        const iframe = ytMountRef.current?.querySelector("iframe");
+        if (iframe?.contentWindow) {
+          try {
+            iframe.contentWindow.postMessage(
+              JSON.stringify({ event: "command", func: "unloadModule", args: ["captions"] }),
+              "*"
+            );
+            iframe.contentWindow.postMessage(
+              JSON.stringify({ event: "command", func: "setOption", args: ["captions", "track", {}] }),
+              "*"
+            );
+          } catch {}
+        }
+
+        // If captions were toggled ON during this session, cleanly recreate the iframe at curTime with cc_load_policy=0
+        if (hadCaptionsRef.current) {
+          hadCaptionsRef.current = false;
+          ytStartAtRef.current = curTime;
+          setYtSessionKey((k) => k + 1);
+        }
+      } else {
+        hadCaptionsRef.current = true;
+        try { yt.loadModule?.("captions"); } catch {}
+        try { yt.setOption?.("captions", "track", { languageCode: "tr" }); } catch {}
+        const iframe = ytMountRef.current?.querySelector("iframe");
+        if (iframe?.contentWindow) {
+          try {
+            iframe.contentWindow.postMessage(
+              JSON.stringify({ event: "command", func: "loadModule", args: ["captions"] }),
+              "*"
+            );
+            iframe.contentWindow.postMessage(
+              JSON.stringify({ event: "command", func: "setOption", args: ["captions", "track", { languageCode: "tr" }] }),
+              "*"
+            );
+          } catch {}
+        }
+      }
+    }
+
     setActiveSub(id);
   };
 
@@ -697,7 +884,7 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-50 flex flex-col bg-black"
+      className="fixed inset-0 z-[65] flex flex-col bg-black"
       onMouseMove={pingUI}
       onTouchStart={pingUI}
       style={{ cursor: uiVisible ? "auto" : "none" }}
@@ -711,6 +898,10 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
             ref={ytMountRef}
             className="pointer-events-none w-full h-full absolute inset-0 [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:absolute [&>iframe]:inset-0"
           />
+          {/* Mask native YouTube paused/title chrome with TG backdrop */}
+          {!playing && (
+            <div className="pointer-events-none absolute inset-0 z-[5] bg-black/80 backdrop-blur-sm transition-opacity duration-300" />
+          )}
         </div>
       ) : (
         <video
@@ -723,17 +914,23 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
           poster={media.backdrop}
         />
       )}
-      {/* Direct broadcast logo watermark (embedded on stream, no background panel/box) */}
-      <div className="absolute right-6 top-6 z-30 pointer-events-none select-none md:right-8 md:top-8">
-        <img
-          src={
-            media.poster && (media.poster.includes("tgtv") || media.id?.startsWith("tgtv-"))
-              ? media.poster
-              : "/assets/tgtv-logos/tgtv-genel.png"
-          }
-          alt={media.title || "TG TV Logo"}
-          className="h-10 w-auto object-contain sm:h-14 md:h-16 drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)] filter"
-        />
+      {/* Animated direct broadcast logo watermark (original TG logo + channel-specific chrome animation) */}
+      <div className="absolute right-20 top-5 z-30 pointer-events-none select-none md:right-24 md:top-6 flex items-center gap-2.5">
+        <div className="relative tgtv-logo-stage rounded-xl px-2 py-1">
+          <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-fuchsia-500/45 via-purple-500/35 to-pink-500/45 blur-lg animate-pulse" />
+          <img
+            src={
+              media.channelId
+                ? getTGTVLogo(media.channelId)
+                : media.poster && (media.poster.includes("tgtv") || media.id?.startsWith("tgtv-"))
+                  ? media.poster
+                  : "/assets/tgtv-logos/tgtv-genel-orig.png"
+            }
+            alt={media.title || "TG TV Logo"}
+            data-testid="player-watermark-logo"
+            className={`relative h-11 w-auto object-contain sm:h-14 md:h-16 ${getTGTVChannelAnimation(media.channelId)}`}
+          />
+        </div>
       </div>
       {/* clear glass — no top/bottom gradient shadow */}
 
@@ -742,12 +939,25 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
         className={`relative z-30 flex items-start justify-between gap-3 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] transition-opacity duration-500 sm:px-5 md:px-8 md:pt-6 ${uiVisible ? "opacity-100 pointer-events-auto" : "pointer-events-none opacity-0"}`}
       >
         <div className="min-w-0 flex-1">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.3em] text-purple-300 md:text-xs md:tracking-[0.4em]">
-            {playing ? "● Yayında" : "❚❚ Duraklatıldı"} · {currentRes.label}
+          <div className="flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-purple-300 md:text-xs md:tracking-[0.4em]">
+            <span>{playing ? "● Yayında" : "❚❚ Duraklatıldı"} · {currentRes.label}</span>
+            {media.isBreak && (
+              <span
+                data-testid="break-kuşağı-badge"
+                className="rounded-full border border-amber-400/50 bg-amber-500/20 px-2.5 py-0.5 text-[10px] font-black tracking-wider text-amber-300"
+              >
+                REKLAM & FRAGMAN KUŞAĞI
+              </span>
+            )}
           </div>
           <h2 className="mt-1 truncate text-lg font-black text-white drop-shadow-2xl sm:text-2xl md:mt-2 md:text-4xl">
             {media.title}
           </h2>
+          {media.seriesTitle && media.seriesTitle !== media.title && (
+            <p className="mt-0.5 truncate text-xs font-bold text-fuchsia-300 sm:text-sm">
+              {media.seriesTitle}
+            </p>
+          )}
           <p className="mt-1 truncate text-[11px] text-white/70 md:mt-2 md:text-sm">
             {media.year} · {media.genre} · ⭐ IMDB {media.rating}
             {currentHeight ? ` · ${currentHeight}p` : ""}
@@ -927,6 +1137,64 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
       <div
         className={`relative z-30 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 transition-opacity duration-500 sm:px-5 md:px-8 md:pb-6 ${uiVisible ? "opacity-100 pointer-events-auto" : "pointer-events-none opacity-0"}`}
       >
+        {/* Language / Subtitle panel — anchored above controls, never clipped by overflow-x-auto */}
+        {showLang && (
+          <div className="mb-3 ml-auto w-full max-w-xs overflow-hidden rounded-2xl border border-white/15 bg-black/95 p-3 text-white shadow-[0_20px_60px_rgba(168,85,247,0.45)] backdrop-blur-xl">
+            <div className="mb-1 flex items-center justify-between">
+              <span className="text-[11px] font-black uppercase tracking-widest text-purple-300">
+                Ses / Dublaj
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowLang(false)}
+                aria-label="Altyazı menüsünü kapat"
+                className="rounded-full p-1 text-white/60 hover:bg-white/10 hover:text-white"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+            {audioTracks.length === 0 ? (
+              <div className="mb-2 text-[11px] text-white/50">
+                Bu yayın tek ses kanalı sunuyor.
+              </div>
+            ) : (
+              audioTracks.map((t) => (
+                <button
+                  key={`a-${t.id}`}
+                  onClick={() => pickAudio(t.id)}
+                  className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left text-xs hover:bg-white/10"
+                >
+                  <span className="truncate">{t.label}</span>
+                  {activeAudio === t.id && <Check className="h-3.5 w-3.5 text-purple-300" />}
+                </button>
+              ))
+            )}
+            <div className="mb-1 mt-3 text-[11px] font-black uppercase tracking-widest text-purple-300">
+              Altyazı
+            </div>
+            <button
+              onClick={() => pickSub(-1)}
+              className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left text-xs hover:bg-white/10"
+            >
+              <span>Kapalı</span>
+              {activeSub === -1 && <Check className="h-3.5 w-3.5 text-purple-300" />}
+            </button>
+            {subTracks.map((t) => (
+              <button
+                key={`s-${t.id}`}
+                onClick={() => pickSub(t.id)}
+                className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left text-xs hover:bg-white/10"
+              >
+                <span className="truncate">{t.label}</span>
+                {activeSub === t.id && <Check className="h-3.5 w-3.5 text-purple-300" />}
+              </button>
+            ))}
+            {subTracks.length === 0 && (
+              <div className="text-[11px] text-white/50">Yayında altyazı bulunmuyor.</div>
+            )}
+          </div>
+        )}
+
         {/* Resolution panel — anchored above controls, width-safe */}
         {showRes && (
           <div className="mb-3 ml-auto w-full max-w-xs overflow-hidden rounded-2xl border border-white/10 bg-black/90 p-2 backdrop-blur-xl shadow-[0_20px_60px_rgba(168,85,247,0.4)]">
@@ -1032,67 +1300,25 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
             />
           </div>
 
-          <div className="relative shrink-0">
-            <button
-              onClick={() => setShowLang((s) => !s)}
-              aria-label="Dublaj ve altyazı"
-              className={`flex items-center gap-2 rounded-full px-3 py-2.5 text-xs font-semibold backdrop-blur transition active:scale-95 md:px-4 md:py-3 md:text-sm ${
-                showLang ? "bg-purple-600 text-white" : "bg-white/10 text-white hover:bg-white/20"
-              }`}
-            >
-              <Languages className="h-4 w-4" />
-              <span className="hidden sm:inline">Dublaj / Altyazı</span>
-            </button>
-            {showLang && (
-              <div className="absolute bottom-14 left-0 z-20 w-64 rounded-2xl border border-white/15 bg-black/90 p-3 text-white shadow-2xl backdrop-blur">
-                <div className="mb-1 text-[11px] font-black uppercase tracking-widest text-purple-300">
-                  Ses / Dublaj
-                </div>
-                {audioTracks.length === 0 ? (
-                  <div className="mb-2 text-[11px] text-white/50">
-                    Bu yayın tek ses kanalı sunuyor.
-                  </div>
-                ) : (
-                  audioTracks.map((t) => (
-                    <button
-                      key={`a-${t.id}`}
-                      onClick={() => pickAudio(t.id)}
-                      className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left text-xs hover:bg-white/10"
-                    >
-                      <span className="truncate">{t.label}</span>
-                      {activeAudio === t.id && <Check className="h-3.5 w-3.5 text-purple-300" />}
-                    </button>
-                  ))
-                )}
-                <div className="mb-1 mt-3 text-[11px] font-black uppercase tracking-widest text-purple-300">
-                  Altyazı
-                </div>
-                <button
-                  onClick={() => pickSub(-1)}
-                  className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left text-xs hover:bg-white/10"
-                >
-                  <span>Kapalı</span>
-                  {activeSub === -1 && <Check className="h-3.5 w-3.5 text-purple-300" />}
-                </button>
-                {subTracks.map((t) => (
-                  <button
-                    key={`s-${t.id}`}
-                    onClick={() => pickSub(t.id)}
-                    className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left text-xs hover:bg-white/10"
-                  >
-                    <span className="truncate">{t.label}</span>
-                    {activeSub === t.id && <Check className="h-3.5 w-3.5 text-purple-300" />}
-                  </button>
-                ))}
-                {subTracks.length === 0 && (
-                  <div className="text-[11px] text-white/50">Yayında altyazı bulunmuyor.</div>
-                )}
-              </div>
-            )}
-          </div>
+          <button
+            onClick={() => {
+              setShowLang((s) => !s);
+              setShowRes(false);
+            }}
+            aria-label="Dublaj ve altyazı"
+            className={`flex shrink-0 items-center gap-2 rounded-full px-3 py-2.5 text-xs font-semibold backdrop-blur transition active:scale-95 md:px-4 md:py-3 md:text-sm ${
+              showLang ? "bg-purple-600 text-white" : "bg-white/10 text-white hover:bg-white/20"
+            }`}
+          >
+            <Languages className="h-4 w-4" />
+            <span className="hidden sm:inline">Dublaj / Altyazı</span>
+          </button>
 
           <button
-            onClick={() => setShowRes((s) => !s)}
+            onClick={() => {
+              setShowRes((s) => !s);
+              setShowLang(false);
+            }}
             aria-label="Çözünürlük"
             className={`flex shrink-0 items-center gap-2 rounded-full px-3 py-2.5 text-xs font-semibold backdrop-blur transition active:scale-95 md:px-4 md:py-3 md:text-sm ${
               showRes ? "bg-purple-600 text-white" : "bg-white/10 text-white hover:bg-white/20"

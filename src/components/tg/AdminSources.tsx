@@ -13,6 +13,7 @@ import {
 } from "@/lib/streams.functions";
 import { loadStore } from "@/db/native-db";
 import { checkIsAdmin, claimFirstAdmin } from "@/lib/admin.functions";
+import { getContentPoster } from "@/lib/contentPosters";
 
 import { CardManager } from "./admin/CardManager";
 import { EpisodeManager } from "./admin/EpisodeManager";
@@ -43,9 +44,13 @@ type Props = {
   totalCount?: number;
 };
 
-const fallbackPoster = "https://picsum.photos/seed/tg-custom-source/600/900";
+const fallbackPoster = "/assets/aistudio/Media_item_1_1bba30da.jpg";
 
 export function streamToMedia(stream: UserStream): Media {
+  const verified = getContentPoster(stream.id, stream.title);
+  const poster = verified?.poster || (stream.posterUrl && !stream.posterUrl.includes("picsum.photos") ? stream.posterUrl : fallbackPoster);
+  const backdrop = verified?.backdrop || stream.backdropUrl || stream.posterUrl || fallbackPoster;
+
   return {
     id: `custom-${stream.id}`,
     title: stream.title,
@@ -62,8 +67,8 @@ export function streamToMedia(stream: UserStream): Media {
 
     duration: "Kaynak",
     rating: stream.imdbRating != null ? stream.imdbRating.toFixed(1) : "—",
-    poster: stream.posterUrl || fallbackPoster,
-    backdrop: stream.backdropUrl || stream.posterUrl || fallbackPoster,
+    poster,
+    backdrop,
     description: stream.description || `${stream.category}`,
     video: stream.sourceUrl,
     publishedAt: stream.publishedAt,

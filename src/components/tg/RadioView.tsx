@@ -117,19 +117,25 @@ export function RadioView({ focusedKey, registerRef, onPick, streams }: Props) {
                 tabIndex={-1}
                 onClick={() => {
                   setNowPlaying(s);
-                  onPick(streamToMedia(s));
                 }}
                 className={`group flex aspect-[4/3] flex-col items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-4 outline-none transition active:scale-95 ${
                   isFocus ? "neon-ring scale-105 bg-purple-600/20" : "hover:bg-white/10"
-                } ${isPlaying ? "ring-2 ring-purple-400/60" : ""}`}
+                } ${isPlaying ? "ring-2 ring-purple-400/60 bg-purple-950/30" : ""}`}
               >
-                {s.posterUrl ? (
-                  <img src={s.posterUrl} alt={s.title} className="h-16 w-16 rounded-full object-cover" />
-                ) : (
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-fuchsia-700 text-xl font-black">
-                    {s.title.slice(0, 2).toUpperCase()}
-                  </div>
-                )}
+                <div className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-purple-600 to-fuchsia-700 text-xl font-black text-white shadow-lg border border-white/20">
+                  <span>{s.title.slice(0, 2).toUpperCase()}</span>
+                  {s.posterUrl && (
+                    <img
+                      src={s.posterUrl}
+                      alt={s.title}
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                      className="absolute inset-0 h-full w-full rounded-full object-cover bg-black/40"
+                    />
+                  )}
+                </div>
                 <div className="line-clamp-2 text-center text-xs font-black text-white">{s.title}</div>
                 <span
                   className={`rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${
@@ -140,7 +146,7 @@ export function RadioView({ focusedKey, registerRef, onPick, streams }: Props) {
                         : "bg-emerald-500/80 text-black"
                   }`}
                 >
-                  {s.status === "dead" ? "Kapalı" : s.status === "degraded" ? "Zayıf" : "Canlı"}
+                  {isPlaying ? "Çalıyor" : s.status === "dead" ? "Kapalı" : s.status === "degraded" ? "Zayıf" : "Canlı"}
                 </span>
               </button>
             );

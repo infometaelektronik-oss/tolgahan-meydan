@@ -83,13 +83,13 @@ export function SettingsView({
       <div className="rounded-3xl border border-indigo-500/30 bg-gradient-to-r from-indigo-950/70 via-purple-950/50 to-black p-6 shadow-2xl backdrop-blur-xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-[0_0_20px_rgba(99,102,241,0.6)] shrink-0">
-              <Monitor className="h-6 w-6 text-white" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-[0_0_20px_rgba(99,102,241,0.6)] shrink-0 border border-indigo-300/40">
+              <Monitor className="h-6 w-6 text-white stroke-[2.5]" />
             </div>
             <div>
               <div className="flex items-center gap-2.5">
-                <h1 className="text-xl font-black text-white sm:text-2xl md:text-3xl tracking-tight">
-                  Sistem & Yayın Ayarları
+                <h1 className="text-xl font-black text-white sm:text-2xl md:text-3xl tracking-tight uppercase">
+                  AYARLAR — Sistem ve Yayın Ayarları
                 </h1>
                 <span className="rounded-full bg-indigo-500/20 px-3 py-1 text-xs font-black uppercase tracking-wider text-indigo-300 border border-indigo-500/40">
                   4K / HDR10+ / Dolby Atmos

@@ -67,7 +67,7 @@ function isTurkishStream(s: UserStream): boolean {
 
   // Strictly reject foreign channels masquerading as Turkish
   if (
-    /star\s*(international|cinema|sinema|world|plus|gold|action|movies|channel|101|sports|trek|maa|kentrikis|central|family)|pluto|cinemax|fox\s*(life|live\s*now|sports|news|weather)|tvs\s*drive|ntv\s*(kenya|telugu|series)|abp\s*majha|first\s*india|mh\s*1|almahriah|mekameleen|rselvatv|360tunebox|kn\s*music|rock\s*now|now\s*(70s|80s|90s|tv\s*102)|atv\+\s*noticias|tlc\s*finland|elsharq|madinah|al-zahra|spacetoon/i.test(
+    /star\s*(international|cinema|sinema|world|plus|gold|action|movies|channel|101|sports|trek|maa|kentrikis|central|family)|pluto|cinemax|fox\s*(life|live\s*now|sports|news|weather)|tvs\s*drive|ntv\s*(kenya|telugu|series)|abp\s*majha|first\s*india|mh\s*1|almahriah|mekameleen|rselvatv|360tunebox|kn\s*music|rock\s*now|now\s*(70s|80s|90s|tv\s*102)|atv\+\s*noticias|tlc\s*finland|elsharq|madinah|al-zahra|spacetoon|groovy\s*tv|classique\s*tv|epic\s*bhojpuri|maxcine|persiana/i.test(
       t
     )
   ) {
@@ -146,10 +146,11 @@ export function LiveTV({ focusedKey, registerRef, onPick, streams }: Props) {
             /belgesel|tlc|dmax|habitat|yaban|documentary|nat\s*geo|discovery/i.test(itemTitle);
           if (!isBelgesel) return false;
         } else if (target === "spor") {
+          const isYabanciSpor = itemSub.includes("yabancı");
           const isSpor =
-            itemSub === "spor" ||
-            itemGrp === "spor" ||
-            /spor|sport|futbol|basket|tivibu/i.test(itemTitle);
+            origin === "local"
+              ? !isYabanciSpor && (itemSub === "spor" || itemGrp === "spor" || /\b(a\s*spor|trt\s*spor|ht\s*spor|tivibu\s*spor|beinsports|bein\s*sports|s\s*sport|fb\s*tv|gs\s*tv|bjk\s*tv|tjk\s*tv|sports\s*tv|tv\s*8\.5)\b/i.test(itemTitle))
+              : itemSub.includes("spor") || itemGrp.includes("spor") || /spor|sport|futbol|basket/i.test(itemTitle);
           if (!isSpor) return false;
         } else if (target === "çocuk") {
           const isCocuk =
@@ -325,17 +326,19 @@ export function LiveTV({ focusedKey, registerRef, onPick, streams }: Props) {
 
                 {/* 3D Embossed Logo Chamber */}
                 <div className="relative flex h-20 w-full items-center justify-center rounded-xl bg-gradient-to-b from-black/40 to-black/20 p-2 shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]">
-                  {logo ? (
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 via-fuchsia-600 to-rose-600 border border-white/30 text-xl font-black text-white shadow-[0_4px_15px_rgba(168,85,247,0.5),inset_0_1px_2px_rgba(255,255,255,0.5)]">
+                    {formatCleanChannelTitle(s.title).slice(0, 2).toUpperCase()}
+                  </div>
+                  {logo && (
                     <img
                       src={logo}
                       alt={s.title}
                       loading="lazy"
-                      className="max-h-16 max-w-[85%] object-contain filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.9)] transform transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-0.5"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                      className="absolute inset-0 m-auto max-h-16 max-w-[85%] rounded-lg bg-black/80 p-1 object-contain filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.9)] transform transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-0.5"
                     />
-                  ) : (
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 via-fuchsia-600 to-rose-600 border border-white/30 text-xl font-black text-white shadow-[0_4px_15px_rgba(168,85,247,0.5),inset_0_1px_2px_rgba(255,255,255,0.5)]">
-                      {s.title.slice(0, 2).toUpperCase()}
-                    </div>
                   )}
                 </div>
 

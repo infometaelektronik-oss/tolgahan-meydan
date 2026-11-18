@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { streamToMedia } from "./AdminSources";
 import type { Media } from "./data";
 import type { UserStream } from "@/lib/streams.functions";
@@ -13,6 +13,7 @@ type Props = {
   streams: UserStream[];
   getEnrichment?: (title: string) => { posterUrl?: string; backdropUrl?: string } | null | undefined;
   initialOrigin?: "all" | "local" | "foreign" | "platform";
+  initialSubFilter?: ChannelFilter;
 };
 
 type OriginFilter = "all" | "local" | "foreign" | "platform";
@@ -28,12 +29,20 @@ type ChannelFilter =
   | "Efsaneler"
   | "Netflix"
   | "HBO"
-  | "Tabii TV";
+  | "Tabii TV"
+  | "BluTV"
+  | "Disney+"
+  | "Gain";
 
-export function SeriesView({ focusedKey, registerRef, onPick, streams, getEnrichment, initialOrigin = "all" }: Props) {
+export function SeriesView({ focusedKey, registerRef, onPick, streams, getEnrichment, initialOrigin = "all", initialSubFilter = "Tümü" }: Props) {
   const [origin, setOrigin] = useState<OriginFilter>(initialOrigin);
-  const [selectedSubFilter, setSelectedSubFilter] = useState<ChannelFilter>("Tümü");
+  const [selectedSubFilter, setSelectedSubFilter] = useState<ChannelFilter>(initialSubFilter);
   const [activeSeriesModal, setActiveSeriesModal] = useState<Media | null>(null);
+
+  useEffect(() => {
+    setOrigin(initialOrigin);
+    setSelectedSubFilter(initialSubFilter || "Tümü");
+  }, [initialOrigin, initialSubFilter]);
 
   // Get all items in category === "Series"
   const seriesStreams = useMemo(() => {
@@ -44,7 +53,8 @@ export function SeriesView({ focusedKey, registerRef, onPick, streams, getEnrich
   const originFiltered = useMemo(() => {
     return seriesStreams.filter((s) => {
       const isFor = s.isForeign || s.country === "ABD" || (s.country && s.country !== "Türkiye" && s.country !== "Turkey");
-      const isPlat = /netflix|hbo|tabii/i.test(s.channelGroup || "") || /netflix|hbo|tabii/i.test(s.subCategory || "");
+      const hayPlat = `${s.channelGroup || ""} ${s.subCategory || ""}`.toLowerCase();
+      const isPlat = /netflix|hbo|tabii|blutv|disney|gain|gaİn/i.test(hayPlat);
 
       if (origin === "local") return !isFor;
       if (origin === "foreign") return isFor;
@@ -53,7 +63,7 @@ export function SeriesView({ focusedKey, registerRef, onPick, streams, getEnrich
     });
   }, [seriesStreams, origin]);
 
-  // Sub-filter by specific channel / network
+  // Sub-filter by specific channel / network / platform
   const finalFiltered = useMemo(() => {
     if (selectedSubFilter === "Tümü") {
       return originFiltered.map(streamToMedia);
@@ -79,6 +89,15 @@ export function SeriesView({ focusedKey, registerRef, onPick, streams, getEnrich
         }
         if (target === "tabii tv" || target === "tabii") {
           return grp.includes("tabii") || sub.includes("tabii");
+        }
+        if (target === "blutv") {
+          return grp.includes("blutv") || sub.includes("blutv");
+        }
+        if (target === "disney+" || target === "disney") {
+          return grp.includes("disney") || sub.includes("disney");
+        }
+        if (target === "gain") {
+          return grp.includes("gain") || sub.includes("gain") || grp.includes("gaİn") || sub.includes("gaİn");
         }
         return grp.includes(target) || sub.includes(target);
       })
@@ -119,103 +138,97 @@ export function SeriesView({ focusedKey, registerRef, onPick, streams, getEnrich
     origin === "local"
       ? ["Tümü", "Kanal D", "Show TV", "Star TV", "ATV", "TRT 1", "NOW", "Efsaneler"]
       : origin === "foreign"
-        ? ["Tümü", "HBO", "Netflix"]
+        ? ["Tümü", "HBO", "Netflix", "Disney+"]
         : origin === "platform"
-          ? ["Tümü", "Netflix", "HBO", "Tabii TV"]
-          : ["Tümü", "Kanal D", "Show TV", "Star TV", "ATV", "TRT 1", "NOW", "Netflix", "HBO", "Tabii TV", "Efsaneler"];
+          ? ["Tümü", "Netflix", "HBO", "Tabii TV", "BluTV", "Disney+", "Gain"]
+          : ["Tümü", "Kanal D", "Show TV", "Star TV", "ATV", "TRT 1", "NOW", "Netflix", "HBO", "Tabii TV", "BluTV", "Disney+", "Gain", "Efsaneler"];
 
   return (
     <div className="space-y-6 pb-12">
-      {/* VIP Cyber Series Banner Bar (High legibility, large fonts, themed styling) */}
-      <div className="rounded-3xl border border-blue-500/30 bg-gradient-to-r from-blue-950/70 via-indigo-950/50 to-black p-6 shadow-2xl backdrop-blur-xl">
+      {/* VIP Cyber Series Banner Bar with Integrated 3D Network Pills & Origin Switch */}
+      <div className="rounded-3xl border border-blue-500/30 bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-black p-6 shadow-2xl backdrop-blur-xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-600 shadow-[0_0_20px_rgba(59,130,246,0.6)] shrink-0">
-              <Clapperboard className="h-6 w-6 text-white" />
+          <div className="flex items-center gap-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-600 to-cyan-500 shadow-[0_0_25px_rgba(59,130,246,0.7),inset_0_1px_2px_rgba(255,255,255,0.4)] shrink-0 border border-white/20">
+              <Clapperboard className="h-7 w-7 text-white drop-shadow" />
             </div>
             <div>
-              <div className="flex items-center gap-2.5">
-                <h1 className="text-xl font-black text-white sm:text-2xl md:text-3xl tracking-tight">
-                  {origin === "local" ? "Yerli Türk Dizileri" : origin === "foreign" ? "Yabancı Kült Diziler" : origin === "platform" ? "Dijital Platform Orijinalleri" : "Tüm Dizi Arşivi"}
+              <div className="flex items-center gap-3">
+                <h1 className="text-2xl font-black text-white sm:text-3xl tracking-tight drop-shadow-md">
+                  {origin === "local" ? "Yerli Türk Dizileri" : origin === "foreign" ? "Yabancı Kült Diziler" : origin === "platform" ? "Dijital Platformlar" : "Tüm Dizi Arşivi"}
                 </h1>
-                <span className="rounded-full bg-blue-500/20 px-3 py-1 text-xs font-black uppercase tracking-wider text-blue-300 border border-blue-500/40">
-                  {finalFiltered.length} Yapım
+                <span className="rounded-full bg-blue-500/20 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-blue-300 border border-blue-500/40 shadow-[0_0_12px_rgba(59,130,246,0.3)]">
+                  {finalFiltered.length} Dizi
                 </span>
               </div>
               <p className="mt-1 text-xs text-white/70 sm:text-sm">
-                Kurtlar Vadisi, Ezel, Çukur, İçerde ve en popüler Türk & yabancı televizyon dizileri.
+                Kurtlar Vadisi, Ezel, Çukur, Yalı Çapkını, İnci Taneleri ve dijital platform dizileri tek ekranda.
               </p>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Category Navigation Bar (Aligned directly at top) */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        {/* Origin Selector Pills: Tüm Diziler, Yerli Diziler, Yabancı Diziler, Paralı Platformlar */}
-        <div className="flex flex-wrap items-center gap-2">
-          {[
-            { id: "all" as const, label: "Tüm Diziler", icon: Clapperboard, count: seriesStreams.length },
-            { id: "local" as const, label: "Yerli Diziler", icon: Tv, count: seriesStreams.filter((s) => !s.isForeign).length },
-            { id: "foreign" as const, label: "Yabancı Diziler", icon: Globe, count: seriesStreams.filter((s) => s.isForeign).length },
-            { id: "platform" as const, label: "Platform Orijinal", icon: Sparkles, count: seriesStreams.filter((s) => /netflix|hbo|tabii/i.test(s.channelGroup || "")).length },
-          ].map((item) => {
-            const active = origin === item.id;
-            const Icon = item.icon;
-            const fk = `series-origin-${item.id}`;
+          {/* Origin Switcher (Yerli, Yabancı, Platform, Tümü) */}
+          <div className="flex flex-wrap items-center gap-2">
+            {[
+              { id: "all" as const, label: "Tüm Dizi Arşivi", icon: Clapperboard },
+              { id: "local" as const, label: "Yerli Diziler", icon: Tv },
+              { id: "foreign" as const, label: "Yabancı Diziler", icon: Globe },
+              { id: "platform" as const, label: "Dijital Platformlar", icon: Sparkles },
+            ].map((item) => {
+              const active = origin === item.id;
+              const Icon = item.icon;
+              const fk = `series-origin-${item.id}`;
+              return (
+                <button
+                  key={item.id}
+                  ref={(el) => registerRef(fk, el)}
+                  data-focus-key={fk}
+                  tabIndex={-1}
+                  onClick={() => {
+                    setOrigin(item.id);
+                    setSelectedSubFilter("Tümü");
+                  }}
+                  className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-black uppercase tracking-wider outline-none transition active:scale-95 border ${
+                    active
+                      ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-[0_0_20px_rgba(59,130,246,0.6)] border-cyan-400/50"
+                      : focusedKey === fk
+                        ? "neon-ring scale-105 bg-blue-600/30 text-white border-white/30"
+                        : "bg-white/10 text-white/70 hover:bg-white/15 border-white/10"
+                  }`}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 3D Kanal / Ağ Filtreleri Barı (Kanal D, Show TV, Star TV, ATV, TRT 1, NOW vb.) */}
+        <div className="mt-5 pt-4 border-t border-white/10 flex flex-wrap items-center gap-2">
+          {subFilterOptions.map((opt, i) => {
+            const active = selectedSubFilter === opt;
+            const fk = `series-sub-${i}`;
             return (
               <button
-                key={item.id}
+                key={opt}
                 ref={(el) => registerRef(fk, el)}
                 data-focus-key={fk}
                 tabIndex={-1}
-                onClick={() => {
-                  setOrigin(item.id);
-                  setSelectedSubFilter("Tümü");
-                }}
-                className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-black uppercase tracking-wider outline-none transition active:scale-95 ${
+                onClick={() => setSelectedSubFilter(opt)}
+                className={`relative rounded-xl px-4 py-2 text-xs font-black tracking-wide outline-none transition-all duration-200 border ${
                   active
-                    ? "bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white shadow-[0_0_20px_rgba(168,85,247,0.5)]"
+                    ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-black shadow-[0_4px_15px_rgba(6,182,212,0.5),inset_0_1px_1px_rgba(255,255,255,0.4)] border-cyan-300 scale-105"
                     : focusedKey === fk
-                      ? "neon-ring scale-105 bg-purple-600/30 text-white"
-                      : "bg-white/10 text-white/70 hover:bg-white/15"
+                      ? "neon-ring bg-white/20 text-white border-white/30"
+                      : "bg-white/5 text-white/80 hover:bg-white/15 hover:text-white border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]"
                 }`}
               >
-                <Icon className="h-3.5 w-3.5" />
-                <span>{item.label}</span>
-                <span className="rounded-full bg-white/20 px-1.5 py-0.2 text-[10px] font-bold">
-                  {item.count}
-                </span>
+                {opt}
               </button>
             );
           })}
         </div>
-      </div>
-
-      {/* Network / Channel Secondary Filter Pills */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-white/10 pb-4">
-        {subFilterOptions.map((opt, i) => {
-          const active = selectedSubFilter === opt;
-          const fk = `series-sub-${i}`;
-          return (
-            <button
-              key={opt}
-              ref={(el) => registerRef(fk, el)}
-              data-focus-key={fk}
-              tabIndex={-1}
-              onClick={() => setSelectedSubFilter(opt)}
-              className={`rounded-full px-3.5 py-1.5 text-xs font-bold outline-none transition ${
-                active
-                  ? "bg-white text-black font-black shadow-md"
-                  : focusedKey === fk
-                    ? "neon-ring bg-white/20 text-white"
-                    : "bg-white/5 text-white/60 hover:bg-white/10"
-              }`}
-            >
-              {opt}
-            </button>
-          );
-        })}
       </div>
 
       {/* Series Grid */}
@@ -274,8 +287,13 @@ export function SeriesView({ focusedKey, registerRef, onPick, streams, getEnrich
             <div className="flex items-start justify-between gap-4 border-b border-white/10 pb-4">
               <div className="flex items-center gap-4">
                 <img
-                  src={activeSeriesModal.poster}
+                  src={activeSeriesModal.poster || "/assets/aistudio/Media_item_1_1bba30da.jpg"}
                   alt={activeSeriesModal.title}
+                  onError={(e) => {
+                    if (!e.currentTarget.src.includes("/assets/aistudio/Media_item_1_1bba30da.jpg")) {
+                      e.currentTarget.src = "/assets/aistudio/Media_item_1_1bba30da.jpg";
+                    }
+                  }}
                   className="h-20 w-14 shrink-0 rounded-xl object-cover border border-purple-500/30"
                 />
                 <div>
@@ -323,8 +341,13 @@ export function SeriesView({ focusedKey, registerRef, onPick, streams, getEnrich
                   >
                     <div className="relative h-16 w-28 shrink-0 overflow-hidden rounded-xl bg-black border border-white/10">
                       <img
-                        src={ep.thumbnailUrl || activeSeriesModal.poster}
+                        src={ep.thumbnailUrl || activeSeriesModal.poster || "/assets/aistudio/Media_item_1_1bba30da.jpg"}
                         alt={ep.title}
+                        onError={(e) => {
+                          if (!e.currentTarget.src.includes("/assets/aistudio/Media_item_1_1bba30da.jpg")) {
+                            e.currentTarget.src = "/assets/aistudio/Media_item_1_1bba30da.jpg";
+                          }
+                        }}
                         className="h-full w-full object-cover group-hover:scale-105 transition duration-300"
                       />
                       <div className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-purple-900/40 transition">

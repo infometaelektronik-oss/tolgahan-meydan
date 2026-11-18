@@ -21,7 +21,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 680,
       title: "680. Bölüm (Son Bölüm)",
       description: "Rıza Baba ve ekibi İstanbul sokaklarındaki yeni tehlikeye karşı nefes kesen bir operasyon başlatır.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-arka-sokaklar.jpg",
       videoUrl: "https://www.youtube.com/watch?v=XiA7cGKTZ7c",
       durationMinutes: 125,
       airDate: "2024",
@@ -33,7 +33,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 679,
       title: "679. Bölüm",
       description: "Mesut ve Hüsnü Çoban kritik bir pusuya düşer, ekip teyakkuza geçer.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-arka-sokaklar.jpg",
       videoUrl: "https://www.youtube.com/watch?v=XiA7cGKTZ7c",
       durationMinutes: 120,
       airDate: "2024",
@@ -45,7 +45,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 1,
       title: "1. Bölüm (Efsane Başlangıç)",
       description: "Rıza Baba önderliğindeki özel asayiş ekibinin İstanbul'daki ilk büyük görevi.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-arka-sokaklar.jpg",
       videoUrl: "https://www.youtube.com/watch?v=TBBRBD8Fudg",
       durationMinutes: 90,
       airDate: "2006",
@@ -61,7 +61,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 1,
       title: "1. Bölüm (İlk Bölüm)",
       description: "Azem Yücedağ, yıllar sonra cezaevinden çıkar ve kaybettiği çocuklarının izini sürmeye başlar.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-inci-taneleri.jpg",
       videoUrl: "https://www.youtube.com/watch?v=_WnhZhZGPLE",
       durationMinutes: 130,
       airDate: "2024",
@@ -73,7 +73,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 2,
       title: "2. Bölüm",
       description: "Azem ve Dilber'in yolları kesişir. Azem geçmişin karanlık sırlarıyla yüzleşir.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-inci-taneleri.jpg",
       videoUrl: "https://www.youtube.com/watch?v=_WnhZhZGPLE",
       durationMinutes: 125,
       airDate: "2024",
@@ -85,7 +85,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 17,
       title: "17. Bölüm (Sezon Finali)",
       description: "Azem gerçeğe bir adım daha yaklaşır. Dilber ve Azem için karar anı gelmiştir.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-inci-taneleri.jpg",
       videoUrl: "https://www.youtube.com/watch?v=_WnhZhZGPLE",
       durationMinutes: 135,
       airDate: "2024",
@@ -101,7 +101,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 1,
       title: "1. Bölüm: Bu Bir Mafya Dizisidir",
       description: "Ali Candan'ın yüzü değiştirilip Polat Alemdar kimliğiyle Vadiye ilk adımı.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-kurtlar-vadisi.jpg",
       videoUrl: "https://www.youtube.com/watch?v=DkAHxvoA2Q8",
       durationMinutes: 75,
       airDate: "2003",
@@ -113,7 +113,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 2,
       title: "2. Bölüm: Kurtlar Sofrası",
       description: "Polat Alemdar, Süleyman Çakır ile tanışır ve vadi kuralları işlemeye başlar.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-kurtlar-vadisi.jpg",
       videoUrl: "https://www.youtube.com/watch?v=DkAHxvoA2Q8",
       durationMinutes: 78,
       airDate: "2003",
@@ -125,7 +125,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 97,
       title: "97. Bölüm: Büyük Final",
       description: "Kurtlar Vadisi operasyonunun tarihi mahkeme ve unutulmaz büyük finali.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-kurtlar-vadisi.jpg",
       videoUrl: "https://www.youtube.com/watch?v=DkAHxvoA2Q8",
       durationMinutes: 90,
       airDate: "2005",
@@ -141,7 +141,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 1,
       title: "1. Bölüm: Her İhanet Sevgiyle Başlar",
       description: "Ömer'in ihanete uğrayışı, hapishanedeki dönüşümü ve Ezel Bayraktar olarak doğuşu.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-ezel.jpg",
       videoUrl: "https://www.youtube.com/watch?v=FSo8aRocl9w",
       durationMinutes: 90,
       airDate: "2009",
@@ -153,7 +153,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 2,
       title: "2. Bölüm: Oyun Başlıyor",
       description: "Ezel kumarhanede Eyşan, Cengiz ve Ali'nin karşısına çıkar.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-ezel.jpg",
       videoUrl: "https://www.youtube.com/watch?v=4tulyH8Y91Q",
       durationMinutes: 88,
       airDate: "2009",
@@ -165,7 +165,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 71,
       title: "71. Bölüm: Unutulmaz Final",
       description: "Ezel, Eyşan ve Ramiz Dayı efsanesinin tren istasyonundaki destansı sonu.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-ezel.jpg",
       videoUrl: "https://www.youtube.com/watch?v=4tulyH8Y91Q",
       durationMinutes: 95,
       airDate: "2011",
@@ -181,7 +181,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 1,
       title: "1. Bölüm: Çukur Evimiz, İdris Babamız",
       description: "Yamaç Koçovalı yıllar sonra mahalleye dönmek zorunda kalır.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-cukur.jpg",
       videoUrl: "https://www.youtube.com/watch?v=dQIT3XjiOI4",
       durationMinutes: 120,
       airDate: "2017",
@@ -193,7 +193,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 2,
       title: "2. Bölüm: Vartolu'nun Saldırısı",
       description: "Vartolu Sadettin Çukur'un dengelerini alt üst etmeye kararlıdır.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-cukur.jpg",
       videoUrl: "https://www.youtube.com/watch?v=dQIT3XjiOI4",
       durationMinutes: 125,
       airDate: "2017",
@@ -209,7 +209,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 1,
       title: "1. Bölüm: Polis Okulu Mezuniyeti",
       description: "Sarp Yılmaz mezuniyette Yusuf Müdür'e silah çeker ve Kebapçı Celal'in yanına sızar.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-icerde.jpg",
       videoUrl: "https://www.youtube.com/watch?v=g9ye2PbZzaQ",
       durationMinutes: 120,
       airDate: "2016",
@@ -221,7 +221,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 39,
       title: "39. Bölüm: Büyük Final",
       description: "İki kardeş Sarp ve Umut (Mert) birbirini bulur ve Kebapçı Celal ile son hesaplaşma yaşanır.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-icerde.jpg",
       videoUrl: "https://www.youtube.com/watch?v=g9ye2PbZzaQ",
       durationMinutes: 135,
       airDate: "2017",
@@ -237,7 +237,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 1,
       title: "1. Bölüm: Bir Mucize Olsun",
       description: "Eski polis Poyraz Karayel, oğlunu geri almak için mafya babası Bahri Umman'ın yanına sızar.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-poyraz-karayel.jpg",
       videoUrl: "https://www.youtube.com/watch?v=TqJd3E9g_SM",
       durationMinutes: 120,
       airDate: "2015",
@@ -253,7 +253,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 1,
       title: "1. Bölüm: Ankara Cinayet Büro",
       description: "Başkomiser Behzat Ç. ve cinayet büro ekibi Ankara'nın karanlık sokaklarındaki ilk dosyasını açar.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-behzat-c.jpg",
       videoUrl: "https://www.youtube.com/watch?v=FjyoVZNJriM",
       durationMinutes: 90,
       airDate: "2010",
@@ -269,7 +269,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 1,
       title: "1. Bölüm: Yalıda Doğan Bir Aşk",
       description: "Ferit ve Seyran'ın Antep'ten İstanbul yalılarına uzanan fırtınalı evliliği başlar.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-yali-capkini.jpg",
       videoUrl: "https://www.youtube.com/watch?v=VIBJ4yExWrM",
       durationMinutes: 130,
       airDate: "2022",
@@ -285,7 +285,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 1,
       title: "1. Bölüm: Uyanmaya Hazır Mısın?",
       description: "Ölümden dönen Bahar, ailesinin ve eşinin gerçek yüzüyle yüzleşip doktorluk mesleğine geri döner.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-bahar.jpg",
       videoUrl: "https://www.youtube.com/watch?v=RYzd3cGAsMU",
       durationMinutes: 130,
       airDate: "2024",
@@ -301,38 +301,10 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 1,
       title: "1. Bölüm: İki Farklı Dünya",
       description: "Doğa ve Fatih'in aşkı, köklü ve farklı kültürdeki iki aileyi bir araya getirir.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-kizilcik-serbeti.jpg",
       videoUrl: "https://www.youtube.com/watch?v=X_yBRarj8lE",
       durationMinutes: 130,
       airDate: "2022",
-    },
-  ],
-
-  // Taş Kağıt Makas (Kanal D)
-  "tr-dizi-tas-kagit-makas": [
-    {
-      id: "tkm-1",
-      seriesId: "tr-dizi-tas-kagit-makas",
-      seasonNumber: 1,
-      episodeNumber: 1,
-      title: "1. Bölüm (İlk Bölüm)",
-      description: "Hipertimezi hastası Umut, babasının masumiyetini kanıtlamak için adalet savaşına başlar.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80",
-      videoUrl: "https://www.youtube.com/watch?v=n6p0ZuSW3Mg",
-      durationMinutes: 130,
-      airDate: "2024",
-    },
-    {
-      id: "tkm-2",
-      seriesId: "tr-dizi-tas-kagit-makas",
-      seasonNumber: 1,
-      episodeNumber: 2,
-      title: "2. Bölüm",
-      description: "Harun Yakar ve Umut'un yolları kesişir, büyük komplo derinleşir.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80",
-      videoUrl: "https://www.youtube.com/watch?v=n6p0ZuSW3Mg",
-      durationMinutes: 125,
-      airDate: "2024",
     },
   ],
 
@@ -345,7 +317,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 1,
       title: "1. Bölüm (4K - İlk Bölüm)",
       description: "Ilgaz Kaya ve Ceylin Erguvan bir cinayet vakasıyla bir araya gelir.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-yargi.jpg",
       videoUrl: "https://www.youtube.com/watch?v=KqxAM9FNT-I",
       durationMinutes: 135,
       airDate: "2021",
@@ -357,7 +329,7 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       episodeNumber: 2,
       title: "2. Bölüm",
       description: "Çınar'ın şüpheli durumu Ilgaz ve Ceylin'i zorlu bir sınavın eşiğine getirir.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600&auto=format&fit=crop&q=80",
+      thumbnailUrl: "/assets/posters/tr-dizi-yargi.jpg",
       videoUrl: "https://www.youtube.com/watch?v=KqxAM9FNT-I",
       durationMinutes: 130,
       airDate: "2021",
@@ -370,64 +342,78 @@ export const SERIES_EPISODES: Record<string, SeriesEpisode[]> = {
       id: "kg-1",
       seriesId: "tr-dizi-kizil-goncalar",
       seasonNumber: 1,
-      episodeNumber: 1,
-      title: "1. Bölüm (İlk Bölüm)",
-      description: "Meryem ve kızı Zeynep'in İstanbul'a gelişi ve Levent Alkanlı ile yollarının kesişmesi.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80",
-      videoUrl: "https://www.youtube.com/watch?v=kJiPjewTae4",
+      episodeNumber: 12,
+      title: "12. Bölüm (Full HD)",
+      description: "Meryem, Zeynep ve Levent Alkanlı'nın kesişen hayatlarında gerilim yükselir.",
+      thumbnailUrl: "/assets/posters/tr-dizi-kizil-goncalar.jpg",
+      videoUrl: "https://www.youtube.com/watch?v=N6F4BXhHQkY",
       durationMinutes: 135,
-      airDate: "2023",
+      airDate: "2024",
     },
   ],
 
-  // Söz (Star TV - TIMS&B)
-  "tr-dizi-soz": [
+  // Sana Söz (Star TV)
+  "tr-dizi-sana-soz": [
     {
-      id: "soz-1",
-      seriesId: "tr-dizi-soz",
+      id: "ss-1",
+      seriesId: "tr-dizi-sana-soz",
       seasonNumber: 1,
       episodeNumber: 1,
-      title: "1. Bölüm: Gözün Arkada Kalmasın",
-      description: "Kıdemli Üsteğmen Yavuz Karasu ve Özel Kuvvetler Timi'nin vatan mücadelesi başlar.",
-      thumbnailUrl: "https://images.unsplash.com/photo-1509281373149-e957c6296406?w=600&auto=format&fit=crop&q=80",
-      videoUrl: "https://www.youtube.com/watch?v=lXPn1623C6M",
+      title: "1. Bölüm (İlk Bölüm)",
+      description: "Cinayet Büro Amiri Ömer Duran ve program sunucusu Elif Karaca'nın adalet arayışı.",
+      thumbnailUrl: "/assets/posters/tr-dizi-sana-soz.svg",
+      videoUrl: "https://www.youtube.com/watch?v=jWHYXYZZmN4",
       durationMinutes: 125,
-      airDate: "2017",
+      airDate: "2021",
     },
   ],
 };
 
-/**
- * Returns episode list for a series.
- * Uses the series own real stream URL or verified catalogue URL if not in static dict.
- */
+function normalizeTrText(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/ğ/g, "g")
+    .replace(/ü/g, "u")
+    .replace(/ş/g, "s")
+    .replace(/ı/g, "i")
+    .replace(/İ/g, "i")
+    .replace(/ö/g, "o")
+    .replace(/ç/g, "c")
+    .trim();
+}
+
 export function getEpisodesForSeries(seriesId: string, seriesTitle: string, defaultVideoUrl?: string): SeriesEpisode[] {
+  const cleanId = seriesId.replace(/^custom-/, "");
   if (SERIES_EPISODES[seriesId]) {
     return SERIES_EPISODES[seriesId];
   }
+  if (SERIES_EPISODES[cleanId]) {
+    return SERIES_EPISODES[cleanId];
+  }
 
-  // Also check normalized ID matching
-  const norm = seriesTitle.toLowerCase();
+  // Also check normalized ID & Turkish diacritic matching
+  const norm = normalizeTrText(seriesTitle);
+  const normCleanId = normalizeTrText(cleanId).replace(/-/g, " ");
   for (const [key, eps] of Object.entries(SERIES_EPISODES)) {
-    const k = key.replace(/^tr-dizi-/, "").replace(/-/g, " ");
-    if (norm.includes(k) || k.includes(norm)) {
+    const k = normalizeTrText(key.replace(/^(tr-dizi-|series-|world-dizi-)/, "").replace(/-/g, " "));
+    if ((norm && (norm.includes(k) || k.includes(norm))) || (normCleanId && normCleanId.includes(k))) {
       return eps;
     }
   }
 
-  const fallbackThumb = "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80";
+  const fallbackThumb = "/assets/aistudio/Media_item_1_1bba30da.jpg";
   const safeVideoUrl = defaultVideoUrl || "https://www.youtube.com/watch?v=DkAHxvoA2Q8";
 
-  return [1, 2, 3, 4, 5].map((epNum) => ({
+  return [1, 2, 3].map((epNum) => ({
     id: `${seriesId}-ep-${epNum}`,
     seriesId,
     seasonNumber: 1,
     episodeNumber: epNum,
-    title: epNum === 1 ? `1. Bölüm (İlk Bölüm)` : epNum === 5 ? `5. Bölüm (Sezon Finali)` : `${epNum}. Bölüm`,
+    title: epNum === 1 ? `1. Bölüm (İlk Bölüm)` : `${epNum}. Bölüm`,
     description: `${seriesTitle} dizisinin heyecan dolu ${epNum}. bölümü.`,
     thumbnailUrl: fallbackThumb,
     videoUrl: safeVideoUrl,
-    durationMinutes: 110 + epNum * 4,
+    durationMinutes: 90 + epNum * 10,
     airDate: "2024",
   }));
 }
