@@ -62,7 +62,9 @@ export function streamToMedia(stream: UserStream): Media {
           ? "Film"
           : stream.category === "Radio"
             ? "Radyo"
-            : "Canlı TV",
+            : stream.category === "TV Programs"
+              ? "TV Programı"
+              : "Canlı TV",
     genres: [typeof stream.subCategory === "string" ? stream.subCategory : stream.category],
 
     duration: "Kaynak",
@@ -86,9 +88,10 @@ export function streamToMedia(stream: UserStream): Media {
   };
 }
 
-const TYPE_OPTIONS: { id: "movie" | "series" | "live" | "radio"; label: string; category: StreamCategory }[] = [
+const TYPE_OPTIONS: { id: "movie" | "series" | "live" | "radio" | "tvprogram"; label: string; category: StreamCategory }[] = [
   { id: "movie", label: "Film", category: "Movies" },
   { id: "series", label: "Dizi", category: "Series" },
+  { id: "tvprogram", label: "TV Programı", category: "TV Programs" },
   { id: "live", label: "Canlı TV", category: "Live TV" },
   { id: "radio", label: "Radyo", category: "Radio" },
 ];
@@ -127,7 +130,7 @@ export function AdminSources({ focusedKey, registerRef, onPick, streams, onChang
     streamUrl: string;
     posterUrl: string;
     category: string;
-    type: "movie" | "series" | "live" | "radio";
+    type: "movie" | "series" | "live" | "radio" | "tvprogram";
   }>({ title: "", streamUrl: "", posterUrl: "", category: "", type: "movie" });
 
   useEffect(() => {

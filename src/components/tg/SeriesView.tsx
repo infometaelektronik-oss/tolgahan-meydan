@@ -27,12 +27,30 @@ type ChannelFilter =
   | "TRT 1"
   | "NOW"
   | "Efsaneler"
+  | "Yabancı Dizi"
   | "Netflix"
   | "HBO"
   | "Tabii TV"
   | "BluTV"
   | "Disney+"
   | "Gain";
+
+const SERIES_GROUP_SECTIONS: { id: string; title: string; match: (s: UserStream) => boolean }[] = [
+  { id: "kanald", title: "Kanal D Dizileri", match: (s) => `${s.channelGroup || ""} ${s.subCategory || ""}`.toLowerCase().includes("kanal d") },
+  { id: "show", title: "Show TV Dizileri", match: (s) => `${s.channelGroup || ""} ${s.subCategory || ""}`.toLowerCase().includes("show") },
+  { id: "atv", title: "ATV Dizileri", match: (s) => `${s.channelGroup || ""} ${s.subCategory || ""}`.toLowerCase().includes("atv") },
+  { id: "now", title: "NOW TV Dizileri", match: (s) => /now|fox/i.test(`${s.channelGroup || ""} ${s.subCategory || ""}`) },
+  { id: "star", title: "Star TV Dizileri", match: (s) => `${s.channelGroup || ""} ${s.subCategory || ""}`.toLowerCase().includes("star") },
+  { id: "trt1", title: "TRT 1 Dizileri", match: (s) => `${s.channelGroup || ""} ${s.subCategory || ""}`.toLowerCase().includes("trt 1") },
+  { id: "efsaneler", title: "Efsane Diziler", match: (s) => `${s.channelGroup || ""} ${s.subCategory || ""}`.toLowerCase().includes("efsane") },
+  { id: "yabanci", title: "Yabancı Diziler", match: (s) => `${s.channelGroup || ""} ${s.subCategory || ""}`.toLowerCase().includes("yabancı") },
+  { id: "netflix", title: "Netflix Dizileri", match: (s) => `${s.channelGroup || ""} ${s.subCategory || ""}`.toLowerCase().includes("netflix") },
+  { id: "hbo", title: "HBO Dizileri", match: (s) => `${s.channelGroup || ""} ${s.subCategory || ""}`.toLowerCase().includes("hbo") },
+  { id: "tabii", title: "Tabii TV Dizileri", match: (s) => `${s.channelGroup || ""} ${s.subCategory || ""}`.toLowerCase().includes("tabii") },
+  { id: "blutv", title: "BluTV Dizileri", match: (s) => `${s.channelGroup || ""} ${s.subCategory || ""}`.toLowerCase().includes("blutv") },
+  { id: "disney", title: "Disney+ Dizileri", match: (s) => `${s.channelGroup || ""} ${s.subCategory || ""}`.toLowerCase().includes("disney") },
+  { id: "gain", title: "Gain Dizileri", match: (s) => /gain|gaİn/i.test(`${s.channelGroup || ""} ${s.subCategory || ""}`) },
+];
 
 export function SeriesView({ focusedKey, registerRef, onPick, streams, getEnrichment, initialOrigin = "all", initialSubFilter = "Tümü" }: Props) {
   const [origin, setOrigin] = useState<OriginFilter>(initialOrigin);
@@ -81,6 +99,9 @@ export function SeriesView({ focusedKey, registerRef, onPick, streams, getEnrich
         if (target === "efsaneler") {
           return grp.includes("efsane") || sub.includes("efsane");
         }
+        if (target === "yabancı dizi") {
+          return grp.includes("yabancı") || sub.includes("yabancı") || Boolean(s.isForeign && !/netflix|hbo|disney/i.test(`${grp} ${sub}`));
+        }
         if (target === "netflix") {
           return grp.includes("netflix") || sub.includes("netflix");
         }
@@ -103,6 +124,27 @@ export function SeriesView({ focusedKey, registerRef, onPick, streams, getEnrich
       })
       .map(streamToMedia);
   }, [originFiltered, selectedSubFilter]);
+
+  const groupedSections = useMemo(() => {
+    const usedIds = new Set<string>();
+    const sections = SERIES_GROUP_SECTIONS.map((sec) => {
+      const matched = originFiltered.filter((s) => {
+        if (usedIds.has(s.id)) return false;
+        if (sec.match(s)) {
+          usedIds.add(s.id);
+          return true;
+        }
+        return false;
+      });
+      return { id: sec.id, title: sec.title, items: matched.map(streamToMedia) };
+    }).filter((sec) => sec.items.length > 0);
+
+    const remaining = originFiltered.filter((s) => !usedIds.has(s.id)).map(streamToMedia);
+    if (remaining.length > 0) {
+      sections.push({ id: "diger", title: "Diğer Diziler", items: remaining });
+    }
+    return sections;
+  }, [originFiltered]);
 
   // When a series card is clicked, open the episode selector modal
   const handleSeriesCardClick = (m: Media) => {
@@ -138,14 +180,16 @@ export function SeriesView({ focusedKey, registerRef, onPick, streams, getEnrich
     origin === "local"
       ? ["Tümü", "Kanal D", "Show TV", "Star TV", "ATV", "TRT 1", "NOW", "Efsaneler"]
       : origin === "foreign"
-        ? ["Tümü", "HBO", "Netflix", "Disney+"]
+        ? ["Tümü", "Yabancı Dizi", "HBO", "Netflix", "Disney+"]
         : origin === "platform"
           ? ["Tümü", "Netflix", "HBO", "Tabii TV", "BluTV", "Disney+", "Gain"]
-          : ["Tümü", "Kanal D", "Show TV", "Star TV", "ATV", "TRT 1", "NOW", "Netflix", "HBO", "Tabii TV", "BluTV", "Disney+", "Gain", "Efsaneler"];
+          : ["Tümü", "Kanal D", "Show TV", "Star TV", "ATV", "TRT 1", "NOW", "Efsaneler", "Yabancı Dizi", "Netflix", "HBO", "Tabii TV", "BluTV", "Disney+", "Gain"];
+
+  let cardCounter = 0;
 
   return (
     <div className="space-y-6 pb-12">
-      {/* VIP Cyber Series Banner Bar with Integrated 3D Network Pills & Origin Switch */}
+      {/* Banner Bar with Network Pills & Origin Switch */}
       <div className="rounded-3xl border border-blue-500/30 bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-black p-6 shadow-2xl backdrop-blur-xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -155,22 +199,22 @@ export function SeriesView({ focusedKey, registerRef, onPick, streams, getEnrich
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-2xl font-black text-white sm:text-3xl tracking-tight drop-shadow-md">
-                  {origin === "local" ? "Yerli Türk Dizileri" : origin === "foreign" ? "Yabancı Kült Diziler" : origin === "platform" ? "Dijital Platformlar" : "Tüm Dizi Arşivi"}
+                  {origin === "local" ? "Yerli Türk Dizileri" : origin === "foreign" ? "Yabancı Diziler" : origin === "platform" ? "Dijital Platformlar" : "Dizi Dünyası"}
                 </h1>
                 <span className="rounded-full bg-blue-500/20 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-blue-300 border border-blue-500/40 shadow-[0_0_12px_rgba(59,130,246,0.3)]">
                   {finalFiltered.length} Dizi
                 </span>
               </div>
               <p className="mt-1 text-xs text-white/70 sm:text-sm">
-                Kurtlar Vadisi, Ezel, Çukur, Yalı Çapkını, İnci Taneleri ve dijital platform dizileri tek ekranda.
+                Kanal D, Show TV, ATV, NOW TV, Star TV, TRT 1, yabancı diziler ve dijital platform yapımları.
               </p>
             </div>
           </div>
 
-          {/* Origin Switcher (Yerli, Yabancı, Platform, Tümü) */}
+          {/* Origin Switcher (Dizi Dünyası, Yerli, Yabancı, Platform) */}
           <div className="flex flex-wrap items-center gap-2">
             {[
-              { id: "all" as const, label: "Tüm Dizi Arşivi", icon: Clapperboard },
+              { id: "all" as const, label: "Dizi Dünyası", icon: Clapperboard },
               { id: "local" as const, label: "Yerli Diziler", icon: Tv },
               { id: "foreign" as const, label: "Yabancı Diziler", icon: Globe },
               { id: "platform" as const, label: "Dijital Platformlar", icon: Sparkles },
@@ -204,7 +248,7 @@ export function SeriesView({ focusedKey, registerRef, onPick, streams, getEnrich
           </div>
         </div>
 
-        {/* 3D Kanal / Ağ Filtreleri Barı (Kanal D, Show TV, Star TV, ATV, TRT 1, NOW vb.) */}
+        {/* Kanal / Ağ Filtreleri Barı */}
         <div className="mt-5 pt-4 border-t border-white/10 flex flex-wrap items-center gap-2">
           {subFilterOptions.map((opt, i) => {
             const active = selectedSubFilter === opt;
@@ -231,40 +275,70 @@ export function SeriesView({ focusedKey, registerRef, onPick, streams, getEnrich
         </div>
       </div>
 
-      {/* Series Grid */}
+      {/* Series Sections (grouped when Tümü is selected, or filtered grid) */}
       <section>
         <div className="mb-4 flex items-center justify-between text-xs font-bold text-white/60">
           <span>{finalFiltered.length} Dizi Listeleniyor</span>
           <span>Bölüm seçmek için diziye tıklayın</span>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-          {finalFiltered.map((media, idx) => {
-            const fk = `series-card-${idx}`;
-            const isFocused = focusedKey === fk;
-
-            return (
-              <div key={media.id} className="relative group">
-                <PosterCard
-                  media={media}
-                  focused={isFocused}
-                  registerRef={(el) => registerRef(fk, el)}
-                  focusKey={fk}
-                  onPick={() => handleSeriesCardClick(media)}
-                />
-
-                {/* Network / Platform Badge */}
-                {media.genre && (
-                  <div className="pointer-events-none absolute left-2 top-2 z-10">
-                    <span className="rounded-md bg-black/80 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-purple-300 backdrop-blur border border-purple-500/30">
-                      {media.genre}
-                    </span>
-                  </div>
-                )}
+        {selectedSubFilter === "Tümü" ? (
+          <div className="space-y-10">
+            {groupedSections.map((sec) => (
+              <div key={sec.id} className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-7 w-1.5 rounded-full bg-gradient-to-b from-blue-400 to-cyan-500" />
+                  <h2 className="text-lg font-black tracking-tight text-white md:text-xl">
+                    {sec.title}
+                  </h2>
+                  <span className="rounded-full border border-blue-500/30 bg-blue-500/15 px-2.5 py-0.5 text-[11px] font-black text-blue-300">
+                    {sec.items.length} Dizi
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+                  {sec.items.map((media) => {
+                    const fk = `series-card-${cardCounter++}`;
+                    const isFocused = focusedKey === fk;
+                    const en = getEnrichment ? getEnrichment(media.title) : null;
+                    return (
+                      <div key={media.id} className="relative group">
+                        <PosterCard
+                          media={media}
+                          focused={isFocused}
+                          registerRef={(el) => registerRef(fk, el)}
+                          focusKey={fk}
+                          onPick={() => handleSeriesCardClick(media)}
+                          posterOverride={en?.posterUrl}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+            {finalFiltered.map((media, idx) => {
+              const fk = `series-card-${idx}`;
+              const isFocused = focusedKey === fk;
+              const en = getEnrichment ? getEnrichment(media.title) : null;
+
+              return (
+                <div key={media.id} className="relative group">
+                  <PosterCard
+                    media={media}
+                    focused={isFocused}
+                    registerRef={(el) => registerRef(fk, el)}
+                    focusKey={fk}
+                    onPick={() => handleSeriesCardClick(media)}
+                    posterOverride={en?.posterUrl}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {finalFiltered.length === 0 && (
           <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-12 text-center text-white/60">

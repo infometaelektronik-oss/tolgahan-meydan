@@ -513,10 +513,10 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
             hls.audioTrack = trAudio.id;
             setActiveAudio(trAudio.id);
           } else if (hls) setActiveAudio(hls.audioTrack);
-          const trSub = subs.find((a) => isTr(a.label));
-          if (trSub && hls) {
-            hls.subtitleTrack = trSub.id;
-            setActiveSub(trSub.id);
+          if (hls) {
+            hls.subtitleTrack = -1;
+            hls.subtitleDisplay = false;
+            setActiveSub(-1);
           }
         };
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -778,6 +778,7 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
           }
         } catch {}
         try { yt.unloadModule?.("captions"); } catch {}
+        try { yt.unloadModule?.("cc"); } catch {}
         try { yt.setOption?.("captions", "track", {}); } catch {}
         try { yt.setOption?.("captions", "reload", true); } catch {}
         try { yt.setOption?.("cc", "track", {}); } catch {}
@@ -791,14 +792,18 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
               "*"
             );
             iframe.contentWindow.postMessage(
+              JSON.stringify({ event: "command", func: "unloadModule", args: ["cc"] }),
+              "*"
+            );
+            iframe.contentWindow.postMessage(
               JSON.stringify({ event: "command", func: "setOption", args: ["captions", "track", {}] }),
               "*"
             );
           } catch {}
         }
 
-        // If captions were toggled ON during this session, cleanly recreate the iframe at curTime with cc_load_policy=0
-        if (hadCaptionsRef.current) {
+        // Cleanly recreate the YouTube iframe at curTime with cc_load_policy=0 if captions were on
+        if (hadCaptionsRef.current || activeSub !== -1) {
           hadCaptionsRef.current = false;
           ytStartAtRef.current = curTime;
           setYtSessionKey((k) => k + 1);
@@ -914,24 +919,21 @@ export function VideoPlayer({ media, onClose, playlist = [], onAutoNext }: Props
           poster={media.backdrop}
         />
       )}
-      {/* Animated direct broadcast logo watermark (original TG logo + channel-specific chrome animation) */}
-      <div className="absolute right-20 top-5 z-30 pointer-events-none select-none md:right-24 md:top-6 flex items-center gap-2.5">
-        <div className="relative tgtv-logo-stage rounded-xl px-2 py-1">
-          <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-fuchsia-500/45 via-purple-500/35 to-pink-500/45 blur-lg animate-pulse" />
-          <img
-            src={
-              media.channelId
-                ? getTGTVLogo(media.channelId)
-                : media.poster && (media.poster.includes("tgtv") || media.id?.startsWith("tgtv-"))
-                  ? media.poster
-                  : "/assets/tgtv-logos/tgtv-genel-orig.png"
-            }
-            alt={media.title || "TG TV Logo"}
-            data-testid="player-watermark-logo"
-            className={`relative h-11 w-auto object-contain sm:h-14 md:h-16 ${getTGTVChannelAnimation(media.channelId)}`}
-          />
-        </div>
-      </div>
+      {/* Direct broadcast logo watermark (kutusuz, tam ekran/boyuta göre kademeli) */}
+      <img
+        src={
+          media.channelId
+            ? getTGTVLogo(media.channelId)
+            : media.poster && (media.poster.includes("tgtv") || media.id?.startsWith("tgtv-"))
+              ? media.poster
+              : "/assets/tgtv-logos/tgtv-genel-orig.png"
+        }
+        alt={media.title || "TG TV Logo"}
+        data-testid="player-watermark-logo"
+        className={`pointer-events-none absolute right-16 top-4 z-30 select-none w-auto object-contain mix-blend-screen transition-all duration-300 md:right-24 md:top-6 ${
+          isFs ? "h-14 sm:h-16 md:h-20" : "h-10 sm:h-11 md:h-12"
+        } ${getTGTVChannelAnimation(media.channelId)}`}
+      />
       {/* clear glass — no top/bottom gradient shadow */}
 
       {/* Top bar */}

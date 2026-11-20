@@ -118,23 +118,29 @@ export function RadioView({ focusedKey, registerRef, onPick, streams }: Props) {
                 onClick={() => {
                   setNowPlaying(s);
                 }}
-                className={`group flex aspect-[4/3] flex-col items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-4 outline-none transition active:scale-95 ${
+                className={`group flex aspect-[4/3] flex-col items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/5 p-3 outline-none transition active:scale-95 ${
                   isFocus ? "neon-ring scale-105 bg-purple-600/20" : "hover:bg-white/10"
                 } ${isPlaying ? "ring-2 ring-purple-400/60 bg-purple-950/30" : ""}`}
               >
-                <div className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-purple-600 to-fuchsia-700 text-xl font-black text-white shadow-lg border border-white/20">
-                  <span>{s.title.slice(0, 2).toUpperCase()}</span>
-                  {s.posterUrl && (
-                    <img
-                      src={s.posterUrl}
-                      alt={s.title}
-                      loading="lazy"
-                      onError={(e) => {
-                        e.currentTarget.style.display = "none";
-                      }}
-                      className="absolute inset-0 h-full w-full rounded-full object-cover bg-black/40"
-                    />
-                  )}
+                {(s.logoUrl || s.posterUrl) ? (
+                  <img
+                    src={s.logoUrl || s.posterUrl}
+                    alt={s.title}
+                    loading="lazy"
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      img.style.display = "none";
+                      const fb = img.nextElementSibling as HTMLElement | null;
+                      if (fb) fb.style.display = "flex";
+                    }}
+                    className="h-20 w-20 flex-1 rounded-full object-contain"
+                  />
+                ) : null}
+                <div
+                  style={{ display: s.logoUrl || s.posterUrl ? "none" : "flex" }}
+                  className="h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-600 to-fuchsia-700 text-xl font-black text-white"
+                >
+                  {s.title.slice(0, 2).toUpperCase()}
                 </div>
                 <div className="line-clamp-2 text-center text-xs font-black text-white">{s.title}</div>
                 <span

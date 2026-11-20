@@ -9,6 +9,7 @@ import {
   Compass,
   Sliders,
   ShieldAlert,
+  MonitorPlay,
 } from "lucide-react";
 import { forwardRef, useEffect, useMemo, useState } from "react";
 
@@ -28,10 +29,11 @@ const ALL_ITEMS: Item[] = [
   { id: "schedule", label: "Yayın Akışı", icon: Clock4, navIndex: 3, neonColor: "text-cyan-400 group-hover:text-cyan-300 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]" },
   { id: "series", label: "Diziler", icon: Clapperboard, navIndex: 4, neonColor: "text-blue-400 group-hover:text-blue-300 drop-shadow-[0_0_8px_rgba(96,165,250,0.8)]" },
   { id: "movies", label: "Filmler", icon: Film, navIndex: 5, neonColor: "text-amber-500 group-hover:text-amber-400 drop-shadow-[0_0_8px_rgba(245,158,11,0.8)]" },
-  { id: "tgtv", label: "TG TV", icon: Zap, navIndex: 6, neonColor: "text-fuchsia-400 group-hover:text-fuchsia-300 drop-shadow-[0_0_12px_rgba(217,70,239,0.9)]" },
-  { id: "search", label: "Ara", icon: Compass, navIndex: 7, neonColor: "text-emerald-400 group-hover:text-emerald-300 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]" },
-  { id: "settings", label: "Ayarlar", icon: Sliders, navIndex: 8, neonColor: "text-indigo-400 group-hover:text-indigo-300 drop-shadow-[0_0_8px_rgba(129,140,248,0.8)]" },
-  { id: "admin", label: "Yönetim", icon: ShieldAlert, navIndex: 9, href: "/tgdizifilm-admin-paneli", neonColor: "text-red-500 group-hover:text-red-400 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" },
+  { id: "tvprograms", label: "TV Programları", icon: MonitorPlay, navIndex: 6, neonColor: "text-emerald-400 group-hover:text-emerald-300 drop-shadow-[0_0_8px_rgba(16,185,129,0.8)]" },
+  { id: "tgtv", label: "TG TV", icon: Zap, navIndex: 7, neonColor: "text-fuchsia-400 group-hover:text-fuchsia-300 drop-shadow-[0_0_12px_rgba(217,70,239,0.9)]" },
+  { id: "search", label: "Ara", icon: Compass, navIndex: 8, neonColor: "text-emerald-400 group-hover:text-emerald-300 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]" },
+  { id: "settings", label: "Ayarlar", icon: Sliders, navIndex: 9, neonColor: "text-indigo-400 group-hover:text-indigo-300 drop-shadow-[0_0_8px_rgba(129,140,248,0.8)]" },
+  { id: "admin", label: "Yönetim", icon: ShieldAlert, navIndex: 10, href: "/tgdizifilm-admin-paneli", neonColor: "text-red-500 group-hover:text-red-400 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" },
 ];
 
 type Props = {

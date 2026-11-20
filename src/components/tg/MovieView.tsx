@@ -48,6 +48,31 @@ const YERLI_SUBCATEGORIES = [
   "Bilim Kurgu",
 ] as const;
 
+function isForeignMovie(m: Media): boolean {
+  if (m.isForeign) return true;
+  const sub = (m.subCategory || "").toLowerCase();
+  if (sub.includes("yabancı")) return true;
+  return /interstellar|inception|dark knight|gladiator|matrix|shawshank|godfather|pulp fiction|fight club|general|nosferatu|sherlock|stranger|detour|carnival|scarlet|cyrano|bunny|sintel|metropolis|night of the living dead|charade|his girl friday|39 steps|haunted hill|little shop|my man godfrey|plan 9|last man on earth|doa|tears of steel|gulliver|popeye/i.test(
+    m.title,
+  );
+}
+
+function isYesilcamMovie(m: Media): boolean {
+  if (isForeignMovie(m)) return false;
+  const titleLower = m.title.toLowerCase();
+  const hay = [m.subCategory || "", m.genre || "", ...(m.genres || []), m.description || ""]
+    .join(" ")
+    .toLowerCase();
+  return (
+    hay.includes("yeşilçam") ||
+    hay.includes("yesilcam") ||
+    /hababam|tosun|süt|şaban|kibar|çöpçü|neşeli|şekerpare|selvi boylum|kapıcılar|davaro|dokunmayın|züğürt|dütdüt/i.test(
+      titleLower,
+    ) ||
+    Boolean(m.year && m.year < 1990)
+  );
+}
+
 export function MovieView({ focusedKey, registerRef, onPick, streams, getEnrichment }: Props) {
   const [mainCat, setMainCat] = useState<(typeof MAIN_CATEGORIES)[number]>("Tüm Filmler");
   const [yerliSubCat, setYerliSubCat] = useState<(typeof YERLI_SUBCATEGORIES)[number]>("Tümü");
@@ -66,42 +91,28 @@ export function MovieView({ focusedKey, registerRef, onPick, streams, getEnrichm
       .map(streamToMedia);
   }, [streams]);
 
+  const categorizedSections = useMemo(() => {
+    const yerli = movies.filter((m) => !isForeignMovie(m) && !isYesilcamMovie(m));
+    const yesilcam = movies
+      .filter((m) => isYesilcamMovie(m))
+      .sort((a, b) => (a.year || 1975) - (b.year || 1975));
+    const foreign = movies.filter((m) => isForeignMovie(m));
+    return [
+      { id: "yerli", title: "Yerli Sinema", badgeColor: "text-amber-300 border-amber-500/30 bg-amber-500/15", items: yerli },
+      { id: "yesilcam", title: "Yeşilçam Klasikleri", badgeColor: "text-emerald-300 border-emerald-500/30 bg-emerald-500/15", items: yesilcam },
+      { id: "yabanci", title: "Yabancı Sinema", badgeColor: "text-rose-300 border-rose-500/30 bg-rose-500/15", items: foreign },
+    ];
+  }, [movies]);
+
   const filteredMovies = useMemo(() => {
     if (mainCat === "Tüm Filmler") return movies;
 
     if (mainCat === "Yeşilçam Klasikleri") {
-      const list = movies.filter((m) => {
-        const titleLower = m.title.toLowerCase();
-        const hay = [
-          m.subCategory || "",
-          m.genre || "",
-          ...(m.genres || []),
-          m.description || "",
-        ].join(" ").toLowerCase();
-
-        return (
-          hay.includes("yeşilçam") ||
-          hay.includes("yesilcam") ||
-          /hababam|tosun|süt|şaban|kibar|çöpçü|neşeli|şekerpare|selvi boylum|kapıcılar|davaro|dokunmayın|züğürt|dütdüt/i.test(titleLower) ||
-          (m.year && m.year < 1990 && !m.isForeign)
-        );
-      });
-      // Sort Yeşilçam classics strictly by production year (yapım yılına göre sıralı)
-      return list.sort((a, b) => (a.year || 1975) - (b.year || 1975));
+      return categorizedSections[1].items;
     }
 
     if (mainCat === "Yerli Sinema") {
-      const yerliList = movies.filter((m) => {
-        if (m.isForeign) return false;
-        const sub = (m.subCategory || "").toLowerCase();
-        if (sub.includes("yabancı")) return false;
-        const titleLower = m.title.toLowerCase();
-        const isYesilcam =
-          /hababam|tosun|süt|şaban|kibar|çöpçü|neşeli|şekerpare|selvi boylum|kapıcılar/i.test(titleLower) ||
-          (m.year && m.year < 1990);
-        return !isYesilcam;
-      });
-
+      const yerliList = categorizedSections[0].items;
       if (yerliSubCat === "Tümü") return yerliList;
 
       return yerliList.filter((m) => {
@@ -119,13 +130,7 @@ export function MovieView({ focusedKey, registerRef, onPick, streams, getEnrichm
     }
 
     if (mainCat === "Yabancı Sinema") {
-      const foreignList = movies.filter((m) => {
-        if (m.isForeign) return true;
-        const sub = (m.subCategory || "").toLowerCase();
-        if (sub.includes("yabancı")) return true;
-        return /interstellar|inception|dark knight|gladiator|matrix|shawshank|godfather|pulp fiction|fight club|general|nosferatu|sherlock|stranger|detour|carnival|scarlet|cyrano|bunny|sintel|metropolis|night of the living dead|charade/i.test(m.title);
-      });
-
+      const foreignList = categorizedSections[2].items;
       if (foreignSubCat === "Tümü") return foreignList;
 
       return foreignList.filter((m) => {
@@ -147,13 +152,13 @@ export function MovieView({ focusedKey, registerRef, onPick, streams, getEnrichm
     }
 
     return movies;
-  }, [movies, mainCat, yerliSubCat, foreignSubCat]);
+  }, [movies, categorizedSections, mainCat, yerliSubCat, foreignSubCat]);
 
   let cardCounter = 0;
 
   return (
     <div className="space-y-6 pb-12">
-      {/* 3D VIP Header & Main Categories Bar */}
+      {/* Header & Main Categories Bar */}
       <div className="rounded-3xl border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-neutral-900/80 to-black p-5 md:p-6 backdrop-blur shadow-[0_10px_35px_rgba(0,0,0,0.6)]">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -163,20 +168,20 @@ export function MovieView({ focusedKey, registerRef, onPick, streams, getEnrichm
             <div>
               <div className="flex items-center gap-3">
                 <h1 className="text-xl md:text-2xl font-black uppercase tracking-wider text-white">
-                  FİLMLER & SİNEMA ARŞİVİ
+                  Film Dünyası
                 </h1>
                 <span className="rounded-full bg-amber-500/20 px-3 py-1 text-xs font-black uppercase tracking-wider text-amber-300 border border-amber-500/30">
                   {filteredMovies.length} Film
                 </span>
               </div>
               <p className="mt-1 text-xs text-white/70 md:text-sm">
-                Seçkin yerli sinema yapımları, yapım yılına göre Yeşilçam klasikleri ve yabancı başyapıtlar.
+                Yerli sinema yapımları, Yeşilçam klasikleri ve yabancı sinema filmleri kategorilere ayrılmış halde.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Main Category 3D Pills */}
+        {/* Main Category Tabs */}
         <div className="mt-5 flex flex-wrap items-center gap-2.5">
           {MAIN_CATEGORIES.map((cat) => {
             const active = mainCat === cat;
@@ -243,8 +248,45 @@ export function MovieView({ focusedKey, registerRef, onPick, streams, getEnrichm
         )}
       </div>
 
-      {/* Movies Grid */}
-      {filteredMovies.length === 0 ? (
+      {/* Categorized Sections when "Tüm Filmler" is selected, or filtered Grid */}
+      {mainCat === "Tüm Filmler" ? (
+        <div className="space-y-10">
+          {categorizedSections.map((sec) => {
+            if (sec.items.length === 0) return null;
+            return (
+              <section key={sec.id} className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-7 w-1.5 rounded-full bg-gradient-to-b from-amber-400 to-orange-600" />
+                  <h2 className="text-lg font-black tracking-tight text-white md:text-xl">
+                    {sec.title}
+                  </h2>
+                  <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-black ${sec.badgeColor}`}>
+                    {sec.items.length} Film
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7">
+                  {sec.items.map((m) => {
+                    const fk = `movie-card-${cardCounter++}`;
+                    const en = getEnrichment ? getEnrichment(m.title) : null;
+                    return (
+                      <div key={m.id} onClick={() => onPick(m)} className="cursor-pointer">
+                        <PosterCard
+                          media={m}
+                          focused={focusedKey === fk}
+                          registerRef={(el) => registerRef(fk, el)}
+                          focusKey={fk}
+                          onPick={onPick}
+                          posterOverride={en?.posterUrl}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      ) : filteredMovies.length === 0 ? (
         <div className="rounded-3xl border border-dashed border-white/15 bg-white/5 p-12 text-center text-white/60">
           Bu kategoride henüz film bulunmuyor.
         </div>

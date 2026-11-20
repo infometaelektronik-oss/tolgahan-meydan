@@ -239,7 +239,7 @@ const ALL_EPG_CHANNELS: EPGChannel[] = [
     name: "CNN International",
     category: "foreign",
     badge: "WORLD NEWS",
-    streamUrl: "https://cnn-cnninternational-1-gb.samsung.wurl.com/manifest/playlist.m3u8",
+    streamUrl: "https://d3bp6dwmpbdajl.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-ury0meh5m4nzm/index.m3u8",
     color: "from-red-700 to-neutral-950",
     programs: [
       { time: "08:00", title: "CNN Newsroom Live", desc: "Breaking news as it happens across America, Europe and Asia." },
@@ -255,7 +255,7 @@ const ALL_EPG_CHANNELS: EPGChannel[] = [
     name: "Euronews (Türkçe / EN)",
     category: "foreign",
     badge: "AVRUPA GÜNDEMİ",
-    streamUrl: "https://euronews-euronews-turkish-1-tr.samsung.wurl.com/manifest/playlist.m3u8",
+    streamUrl: "https://jmp2.uk/plu-6639d7d4b18d700008da5316.m3u8",
     color: "from-blue-700 to-slate-950",
     programs: [
       { time: "07:00", title: "Good Morning Europe", desc: "European political agenda, green transition and tech news." },
@@ -473,19 +473,27 @@ export function ScheduleView({ registerRef, focusedKey, onPick }: Props) {
               {/* Kanal Başlık Barı (Logo, İsim, Rozet, Yayını İzle Butonu) */}
               <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-white/10">
                 <div className="flex items-center gap-4">
-                  {/* 3D Kanal Logosu */}
-                  <div className="relative flex h-14 w-16 items-center justify-center rounded-2xl bg-gradient-to-b from-white/15 to-black/60 p-2 border border-white/20 shadow-[0_6px_15px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.4)] shrink-0">
-                    <div className="text-base font-black text-white">{ch.name.slice(0, 2).toUpperCase()}</div>
-                    {logo && (
+                  {/* Kanal Logosu (Tek kutu, logoyu doldurur) */}
+                  <div className="flex h-16 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/15 bg-black/40">
+                    {logo ? (
                       <img
                         src={logo}
                         alt={ch.name}
                         onError={(e) => {
-                          e.currentTarget.style.display = "none";
+                          const img = e.currentTarget;
+                          img.style.display = "none";
+                          const fb = img.nextElementSibling as HTMLElement | null;
+                          if (fb) fb.style.display = "flex";
                         }}
-                        className="absolute inset-0 m-auto max-h-10 max-w-[85%] rounded-lg bg-black/75 p-0.5 object-contain filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.9)]"
+                        className="h-full w-full object-contain"
                       />
-                    )}
+                    ) : null}
+                    <div
+                      style={{ display: logo ? "none" : "flex" }}
+                      className="h-full w-full items-center justify-center text-base font-black text-white"
+                    >
+                      {ch.name.slice(0, 2).toUpperCase()}
+                    </div>
                   </div>
 
                   <div>

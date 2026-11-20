@@ -18,6 +18,7 @@ import { RadioView } from "@/components/tg/RadioView";
 import { TGTVView } from "@/components/tg/TGTV";
 import { SeriesView } from "@/components/tg/SeriesView";
 import { MovieView } from "@/components/tg/MovieView";
+import { TVProgramsView } from "@/components/tg/TVProgramsView";
 import { PlatformHubs, type PlatformId } from "@/components/tg/PlatformHubs";
 import { getHomeLayout, type HomeRowWithItems } from "@/lib/home-layout.functions";
 
@@ -37,7 +38,7 @@ export const Route = createFileRoute("/")({
 });
 
 const NO_TITLES: string[] = [];
-const NAV_LABELS = ["Ana Sayfa", "Canlı TV", "Radyo", "Yayın Akışı", "Diziler", "Filmler", "TG TV", "Ara", "Ayarlar"];
+const NAV_LABELS = ["Ana Sayfa", "Canlı TV", "Radyo", "Yayın Akışı", "Diziler", "Filmler", "TV Programları", "TG TV", "Ara", "Ayarlar"];
 
 
 function TGApp() {
@@ -109,12 +110,14 @@ function TGApp() {
                   : activeNav === 5
                     ? ["film-0"]
                     : activeNav === 6
-                      ? ["tgtv-0"]
+                      ? ["tvprog-0"]
                       : activeNav === 7
-                        ? ["search-input", "result-0"]
+                        ? ["tgtv-0"]
                         : activeNav === 8
-                          ? ["set-0-0"]
-                          : ["admin-login", "admin-field-0", "admin-submit", "admin-play-0"];
+                          ? ["search-input", "result-0"]
+                          : activeNav === 9
+                            ? ["set-0-0"]
+                            : ["admin-login", "admin-field-0", "admin-submit", "admin-play-0"];
       const firstMain = candidates.map((key) => map.get(key)).find(Boolean);
       if (firstMain) {
         const key = firstMain.getAttribute("data-focus-key") || "";
@@ -330,12 +333,17 @@ function TGApp() {
             />
           )}
 
-          {/* === TG TV (Canlı TV Mantığı: Büyük Neon Kartlar, Tıklandığında Oynatıcı Başlar) === */}
+          {/* === TV PROGRAMLARI === */}
           {activeNav === 6 && (
+            <TVProgramsView focusedKey={focusedKey} registerRef={registerRef} onPick={playMedia} streams={streams} />
+          )}
+
+          {/* === TG TV (Canlı TV Mantığı: Büyük Neon Kartlar, Tıklandığında Oynatıcı Başlar) === */}
+          {activeNav === 7 && (
             <TGTVView focusedKey={focusedKey} registerRef={registerRef} onPick={playMedia} />
           )}
 
-          {activeNav === 7 && (
+          {activeNav === 8 && (
             <SearchView
               focusedKey={focusedKey}
               registerRef={registerRef}
@@ -348,7 +356,7 @@ function TGApp() {
             />
           )}
 
-          {activeNav === 8 && <SettingsView registerRef={registerRef} focusedKey={focusedKey} />}
+          {activeNav === 9 && <SettingsView registerRef={registerRef} focusedKey={focusedKey} />}
 
           {/* Admin paneli sadece /tgdizifilm-admin-paneli URL'sinden erişilir */}
 

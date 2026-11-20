@@ -51,42 +51,25 @@ export function getTGTVLogo(channelId?: string | null): string {
 }
 
 export const TG_CHANNEL_ANIMATIONS: Record<TGChannelId, string> = {
-  "tgtv-hd": "tgtv-anim-hd",
-  "tgtv-sinema": "tgtv-anim-sinema",
-  "tgtv-sinema2": "tgtv-anim-yerli",
-  "tgtv-yesilcam": "tgtv-anim-yesilcam",
-  "tgtv-yerli": "tgtv-anim-dizi",
-  "tgtv-spor": "tgtv-anim-spor",
-  "tgtv-eglence": "tgtv-anim-eglence",
-  "tgtv-cocuk": "tgtv-anim-cocuk",
-  "tgtv-belgesel": "tgtv-anim-belgesel",
-  "tgtv-muzik": "tgtv-anim-muzik",
-  "tgtv-haber": "tgtv-anim-haber",
-  "tgtv-dini": "tgtv-anim-dini",
-  "tgtv-yasam": "tgtv-anim-yasam",
-  "tgtv-yemek": "tgtv-anim-yemek",
-  "tgtv-oyun": "tgtv-anim-oyun",
+  "tgtv-hd": "",
+  "tgtv-sinema": "",
+  "tgtv-sinema2": "",
+  "tgtv-yesilcam": "",
+  "tgtv-yerli": "",
+  "tgtv-spor": "",
+  "tgtv-eglence": "",
+  "tgtv-cocuk": "",
+  "tgtv-belgesel": "",
+  "tgtv-muzik": "",
+  "tgtv-haber": "",
+  "tgtv-dini": "",
+  "tgtv-yasam": "",
+  "tgtv-yemek": "",
+  "tgtv-oyun": "",
 };
 
-export function getTGTVChannelAnimation(channelId?: string | null): string {
-  if (!channelId) return "tgtv-anim-hd";
-  const key = channelId.toLowerCase() as TGChannelId;
-  if (TG_CHANNEL_ANIMATIONS[key]) return TG_CHANNEL_ANIMATIONS[key];
-  if (key.includes("sinema2") || key.includes("yerli-sinema")) return "tgtv-anim-yerli";
-  if (key.includes("yesilcam") || key.includes("yeşilçam")) return "tgtv-anim-yesilcam";
-  if (key.includes("sinema")) return "tgtv-anim-sinema";
-  if (key.includes("yerli") || key.includes("dizi")) return "tgtv-anim-dizi";
-  if (key.includes("spor")) return "tgtv-anim-spor";
-  if (key.includes("eglence") || key.includes("eğlence")) return "tgtv-anim-eglence";
-  if (key.includes("cocuk") || key.includes("çocuk")) return "tgtv-anim-cocuk";
-  if (key.includes("belgesel")) return "tgtv-anim-belgesel";
-  if (key.includes("muzik") || key.includes("müzik")) return "tgtv-anim-muzik";
-  if (key.includes("haber")) return "tgtv-anim-haber";
-  if (key.includes("dini")) return "tgtv-anim-dini";
-  if (key.includes("yasam") || key.includes("yaşam")) return "tgtv-anim-yasam";
-  if (key.includes("yemek")) return "tgtv-anim-yemek";
-  if (key.includes("oyun")) return "tgtv-anim-oyun";
-  return "tgtv-anim-hd";
+export function getTGTVChannelAnimation(_channelId?: string | null): string {
+  return "";
 }
 
 export type BreakTrailer = {
@@ -273,7 +256,7 @@ export const TG_CHANNELS: TGChannelInfo[] = [
     description: "TRT Belgesel, doğa, kültür-sanat, Osmanlı tarihi ve uzay keşifleri belgesel akışı.",
     genre: "Belgesel",
     color: "from-teal-600 to-emerald-700",
-    fallbackStreamUrl: "https://tv-trtbelgesel-dai.medya.trt.com.tr/master.m3u8",
+    fallbackStreamUrl: "https://tv-trt2.medya.trt.com.tr/master.m3u8",
     logoUrl: "/assets/tgtv-logos/tgtv-belgesel-orig.png",
   },
   {
@@ -438,7 +421,7 @@ export function getChannelPool(channelId: TGChannelId): ChannelPoolEntry[] {
         title: "Hokkabaz (Cem Yılmaz — BKM)",
         description: "İskender ve Maradona'nın çıktığı turne yolculuğunda yaşanan komik ve duygusal olaylar.",
         stream_url: "https://www.youtube.com/watch?v=d5N_tbdMNCQ",
-        poster_url: "/assets/posters/tr-film-hokkabaz.svg",
+        poster_url: "/assets/posters/tr-film-hokkabaz.jpg",
         durationHours: 2,
       },
       {
@@ -760,9 +743,9 @@ export function getChannelPool(channelId: TGChannelId): ChannelPoolEntry[] {
   if (channelId === "tgtv-belgesel") {
     return [
       {
-        title: "TRT Belgesel: Yaban Hayatı & Doğanın Sırları",
-        description: "Türkiye'nin vahşi doğası, belgesel serileri ve bilim keşifleri.",
-        stream_url: "https://tv-trtbelgesel-dai.medya.trt.com.tr/master.m3u8",
+        title: "TGRT Belgesel: Doğa, Tarih ve Keşifler",
+        description: "Türkiye ve dünya belgeselleri, doğa, medeniyet tarihi ve kültür keşifleri.",
+        stream_url: "https://b01c02nl.mediatriple.net/videoonlylive/mtsxxkzwwuqtglive/broadcast_5fe462afc6a0e.smil/playlist.m3u8",
         poster_url: "/assets/tgtv-logos/tgtv-belgesel-orig.png",
         durationHours: 2,
       },
@@ -770,7 +753,7 @@ export function getChannelPool(channelId: TGChannelId): ChannelPoolEntry[] {
         title: "Our Planet: Coastal Seas (Doğa Belgeseli)",
         description: "Dünya denizlerinin ve mercan resiflerinin büyüleyici belgesel bölümü.",
         stream_url: "https://www.youtube.com/watch?v=r9PeYPHdpNo",
-        poster_url: "/assets/posters/series-netflix-our-planet.svg",
+        poster_url: "/assets/posters/series-netflix-our-planet.jpg",
         durationHours: 1.5,
       },
       {
@@ -849,7 +832,7 @@ export function getChannelPool(channelId: TGChannelId): ChannelPoolEntry[] {
       {
         title: "Bloomberg HT: Ekonomi & Piyasalar",
         description: "Borsa, döviz, finans dünyası ve iş dünyasından haberler.",
-        stream_url: "https://mumbai-edge.smartplaytv.in/BloombergHT/index.m3u8",
+        stream_url: "https://tv.ensonhaber.com/bloomberght/bloomberght.m3u8",
         poster_url: officialLogo,
         durationHours: 2,
       },
@@ -982,7 +965,7 @@ export function getChannelPool(channelId: TGChannelId): ChannelPoolEntry[] {
         title: "The Atomic Brain: Retro Bilim Kurgu Kuşağı",
         description: "Klasik 1960'lar bilim kurgu ve deneysel gerilim sineması.",
         stream_url: "https://archive.org/download/TheAtomicBrain/TheAtomicBrain.mp4",
-        poster_url: "/assets/posters/movie-atomic-brain.svg",
+        poster_url: "/assets/posters/movie-atomic-brain.jpg",
         durationHours: 1.5,
       },
     ];

@@ -1,4 +1,4 @@
-export type StreamCategory = "Live TV" | "Series" | "Movies" | "Radio";
+export type StreamCategory = "Live TV" | "Series" | "Movies" | "Radio" | "TV Programs";
 export type StreamType = "HLS" | "MP4" | "AUDIO";
 export type StreamStatus = "unknown" | "active" | "degraded" | "dead";
 export type SubCategory =

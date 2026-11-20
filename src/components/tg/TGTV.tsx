@@ -81,6 +81,14 @@ export function TGTVView({ focusedKey, registerRef, onPick }: Props) {
   const hlsRef = useRef<Hls | null>(null);
   const ytPlayerRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const modalPlayerRef = useRef<HTMLDivElement>(null);
+  const [modalIsFs, setModalIsFs] = useState(false);
+
+  useEffect(() => {
+    const onFs = () => setModalIsFs(Boolean(document.fullscreenElement));
+    document.addEventListener("fullscreenchange", onFs);
+    return () => document.removeEventListener("fullscreenchange", onFs);
+  }, []);
 
   const activeChannel = useMemo(
     () => TG_CHANNELS.find((c) => c.id === activeChannelId) || TG_CHANNELS[0],
@@ -611,7 +619,7 @@ export function TGTVView({ focusedKey, registerRef, onPick }: Props) {
           </span>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-5">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {TG_CHANNELS.map((ch) => {
             const isSelected = ch.id === activeChannelId;
             const fk = `tgtv-card-${ch.id}`;
@@ -626,12 +634,12 @@ export function TGTVView({ focusedKey, registerRef, onPick }: Props) {
                   setActiveChannelId(ch.id);
                   handlePlayChannel(ch);
                 }}
-                className={`group relative flex flex-col items-center justify-between rounded-3xl border p-4 text-center outline-none transition-all duration-300 ${
+                className={`group relative flex flex-col items-center justify-between rounded-3xl border-2 p-4 text-center outline-none transition-all duration-300 ${
                   isSelected
-                    ? "border-fuchsia-400 bg-gradient-to-b from-purple-900/60 via-fuchsia-950/40 to-black shadow-[0_0_30px_rgba(217,70,239,0.5)] scale-[1.03] ring-2 ring-fuchsia-400/80"
+                    ? "border-fuchsia-400 bg-black shadow-[0_0_30px_rgba(217,70,239,0.5)] scale-[1.02] ring-2 ring-fuchsia-400/80"
                     : isFocus
-                      ? "neon-ring border-white/60 bg-white/10 scale-105"
-                      : "border-white/10 bg-black/50 hover:border-fuchsia-500/50 hover:bg-white/5 hover:scale-[1.02]"
+                      ? "neon-ring border-white/60 bg-black/90 scale-[1.03]"
+                      : "border-white/15 bg-black/80 hover:border-fuchsia-500/60 hover:bg-black hover:scale-[1.02]"
                 }`}
               >
                 {/* Active Indicator Top Glow */}
@@ -639,30 +647,22 @@ export function TGTVView({ focusedKey, registerRef, onPick }: Props) {
                   <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-purple-400 via-fuchsia-400 to-pink-400 rounded-t-3xl shadow-[0_0_12px_rgba(217,70,239,0.9)]" />
                 )}
 
-                {/* Original TG Channel Logo on Reference Chrome Stage with Per-Channel Animation */}
-                <div className="tgtv-logo-stage relative flex aspect-video w-full items-center justify-center p-2.5 rounded-2xl bg-gradient-to-b from-purple-950/30 via-black/80 to-black border border-white/10 shadow-inner">
-                  <img
-                    src={getTGTVLogo(ch.id)}
-                    alt={ch.name}
-                    className={`h-full w-full object-contain transition duration-300 group-hover:scale-105 ${getTGTVChannelAnimation(ch.id)}`}
-                  />
-                  {/* Play Overlay on Hover */}
-                  <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-black/40 opacity-0 backdrop-blur-xs transition group-hover:opacity-100">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-fuchsia-600 text-white shadow-[0_0_20px_rgba(217,70,239,0.9)]">
-                      <Play className="ml-1 h-6 w-6 fill-current" />
-                    </div>
-                  </div>
-                </div>
+                {/* Original TG Channel Logo filling its card directly (large & elderly-friendly, single box) */}
+                <img
+                  src={getTGTVLogo(ch.id)}
+                  alt={ch.name}
+                  className="aspect-video w-full object-contain mix-blend-screen transition duration-300 group-hover:scale-105"
+                />
 
                 {/* Channel Meta info */}
-                <div className="mt-3 w-full border-t border-white/10 pt-2.5">
-                  <div className="flex items-center justify-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.9)]" />
-                    <span className="text-xs font-black uppercase tracking-wider text-white">
+                <div className="mt-3 w-full border-t border-white/10 pt-3">
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.9)]" />
+                    <span className="text-sm sm:text-base font-black uppercase tracking-wider text-white">
                       {ch.genre}
                     </span>
                   </div>
-                  <div className="mt-1 line-clamp-1 text-[11px] font-bold text-fuchsia-200/90">
+                  <div className="mt-1 line-clamp-1 text-xs sm:text-sm font-bold text-fuchsia-200/90">
                     {ch.badge}
                   </div>
                 </div>
@@ -881,13 +881,31 @@ export function TGTVView({ focusedKey, registerRef, onPick }: Props) {
       {/* Internal Modal Video Player */}
       {playingChannel && !onPick && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl p-4">
-          <div className="relative aspect-video w-full max-w-5xl overflow-hidden rounded-3xl border border-fuchsia-500/40 bg-black shadow-2xl">
-            <button
-              onClick={() => setPlayingChannel(null)}
-              className="absolute right-4 top-4 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white hover:bg-white/20 transition"
-            >
-              <X className="h-6 w-6" />
-            </button>
+          <div
+            ref={modalPlayerRef}
+            className="relative aspect-video w-full max-w-5xl overflow-hidden rounded-3xl border border-fuchsia-500/40 bg-black shadow-2xl"
+          >
+            <div className="absolute right-4 top-4 z-40 flex items-center gap-2">
+              <button
+                onClick={() => {
+                  const el = modalPlayerRef.current;
+                  if (!el) return;
+                  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+                  else el.requestFullscreen?.().catch(() => {});
+                }}
+                title="Tam Ekran"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white hover:bg-white/20 transition"
+              >
+                <Maximize2 className="h-5 w-5" />
+              </button>
+              <button
+                onClick={() => setPlayingChannel(null)}
+                title="Kapat"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white hover:bg-white/20 transition"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
 
             {isYouTube && ytVideoId ? (
               <div className="absolute inset-0 h-full w-full z-0 bg-black flex items-center justify-center overflow-hidden">
@@ -907,17 +925,14 @@ export function TGTVView({ focusedKey, registerRef, onPick }: Props) {
               />
             )}
 
-            {/* Animated Direct Broadcast Logo Bug */}
-            <div className="absolute right-20 top-5 z-30 pointer-events-none select-none flex items-center gap-2">
-              <div className="relative tgtv-logo-stage rounded-xl px-2 py-1">
-                <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-fuchsia-500/45 via-purple-500/35 to-pink-500/45 blur-lg animate-pulse" />
-                <img
-                  src={getTGTVLogo(playingChannel.id)}
-                  alt={playingChannel.name}
-                  className={`relative h-14 w-auto object-contain ${getTGTVChannelAnimation(playingChannel.id)}`}
-                />
-              </div>
-            </div>
+            {/* Direct Broadcast Logo Bug (kutusuz, oynatıcı boyutuna göre kademeli) */}
+            <img
+              src={getTGTVLogo(playingChannel.id)}
+              alt={playingChannel.name}
+              className={`pointer-events-none absolute right-28 top-4 z-30 select-none w-auto object-contain mix-blend-screen transition-all duration-300 ${
+                modalIsFs ? "h-14 sm:h-16 md:h-20" : "h-10 sm:h-11 md:h-12"
+              } ${getTGTVChannelAnimation(playingChannel.id)}`}
+            />
           </div>
         </div>
       )}

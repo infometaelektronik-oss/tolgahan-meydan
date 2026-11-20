@@ -43,14 +43,18 @@ function getNationalRank(title: string): number {
 }
 
 // Clean channel display name (removes technical clutter like "NOW şimdi", "(1080p)", etc.)
-function formatCleanChannelTitle(rawTitle: string): string {
+function formatCleanChannelTitle(rawTitle: string, isForeign?: boolean): string {
   let t = rawTitle.trim();
-  // NOW TV specific: clean "NOW şimdi" or "FOX (NOW)" to "NOW TV"
-  if (/^(now|fox)\b/i.test(t)) {
+  // NOW TV specific: clean Turkish "FOX (NOW)" / "NOW şimdi" to "NOW TV" (only for TR channels)
+  if (!isForeign && /^(now|fox)\b/i.test(t)) {
     return "NOW TV";
   }
-  // Remove technical suffixes
-  t = t.replace(/\s*\(?(1080p|720p|360p|4k|fhd|hd|geo-blocked|not 24\/7|Ⓨ|Ⓢ)\)?/gi, "").trim();
+  // Remove technical suffixes and empty leftover brackets
+  t = t
+    .replace(/\s*[\(\[]?(1080p|720p|360p|4k|fhd|hd|geo-blocked|not 24\/7|Ⓨ|Ⓢ)[\)\]]?/gi, "")
+    .replace(/\[\s*\]|\(\s*\)/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
   return t;
 }
 
@@ -303,7 +307,7 @@ export function LiveTV({ focusedKey, registerRef, onPick, streams }: Props) {
           {userLive.slice(0, shown).map((s, i) => {
             const fk = `live-mine-${i}`;
             const isFocus = focusedKey === fk;
-            const logo = getChannelLogo(s.title, s.posterUrl);
+            const logo = getChannelLogo(s.title, s.logoUrl || s.posterUrl, s.isForeign);
             return (
               <button
                 key={s.id}
@@ -315,36 +319,36 @@ export function LiveTV({ focusedKey, registerRef, onPick, streams }: Props) {
                   if (logo) media.poster = logo;
                   onPick(media);
                 }}
-                className={`group relative flex aspect-[4/3.4] flex-col items-center justify-between rounded-2xl border-2 p-4 outline-none transition-all duration-300 active:scale-95 ${
+                className={`group relative flex aspect-[4/3.4] flex-col items-center justify-between rounded-2xl border-2 p-3 outline-none transition-all duration-300 active:scale-95 ${
                   isFocus
                     ? "neon-ring scale-105 border-fuchsia-400 bg-gradient-to-b from-purple-900/60 via-purple-950/80 to-black shadow-[0_15px_30px_rgba(168,85,247,0.5),inset_0_1px_2px_rgba(255,255,255,0.4)]"
                     : "border-white/15 bg-gradient-to-b from-white/10 via-white/5 to-black/60 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.35)] hover:border-purple-400/60 hover:bg-gradient-to-b hover:from-white/15 hover:via-purple-950/30 hover:to-black"
                 }`}
               >
-                {/* 3D Diagonal light sheen reflection */}
-                <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-tr from-transparent via-white/[0.08] to-transparent opacity-80" />
-
-                {/* 3D Embossed Logo Chamber */}
-                <div className="relative flex h-20 w-full items-center justify-center rounded-xl bg-gradient-to-b from-black/40 to-black/20 p-2 shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 via-fuchsia-600 to-rose-600 border border-white/30 text-xl font-black text-white shadow-[0_4px_15px_rgba(168,85,247,0.5),inset_0_1px_2px_rgba(255,255,255,0.5)]">
-                    {formatCleanChannelTitle(s.title).slice(0, 2).toUpperCase()}
-                  </div>
-                  {logo && (
-                    <img
-                      src={logo}
-                      alt={s.title}
-                      loading="lazy"
-                      onError={(e) => {
-                        e.currentTarget.style.display = "none";
-                      }}
-                      className="absolute inset-0 m-auto max-h-16 max-w-[85%] rounded-lg bg-black/80 p-1 object-contain filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.9)] transform transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-0.5"
-                    />
-                  )}
+                {logo ? (
+                  <img
+                    src={logo}
+                    alt={s.title}
+                    loading="lazy"
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      img.style.display = "none";
+                      const fb = img.nextElementSibling as HTMLElement | null;
+                      if (fb) fb.style.display = "flex";
+                    }}
+                    className="h-full max-h-[72%] w-full flex-1 object-contain filter drop-shadow-[0_6px_14px_rgba(0,0,0,0.85)] transition-transform duration-300 group-hover:scale-105"
+                  />
+                ) : null}
+                <div
+                  style={{ display: logo ? "none" : "flex" }}
+                  className="h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 via-fuchsia-600 to-rose-600 text-xl font-black text-white"
+                >
+                  {formatCleanChannelTitle(s.title, s.isForeign).slice(0, 2).toUpperCase()}
                 </div>
 
-                <div className="w-full text-center mt-2">
+                <div className="mt-2 w-full text-center">
                   <div className="line-clamp-1 text-xs font-black text-white tracking-wide drop-shadow group-hover:text-fuchsia-300 transition">
-                    {formatCleanChannelTitle(s.title)}
+                    {formatCleanChannelTitle(s.title, s.isForeign)}
                   </div>
                 </div>
               </button>

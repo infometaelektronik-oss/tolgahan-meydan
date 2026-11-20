@@ -81,7 +81,7 @@ test("Live TV integrity: No misclassified foreign channels, no foreign Spor leak
   }
 });
 
-test("Radio integrity: Clean audio stations only (no Italian visual TV streams) with local logos on disk", () => {
+test("Radio integrity: Clean audio stations only with genuine local logos on disk", () => {
   const store = loadStore();
   const radios = store.user_streams.filter((s) => s.category === "Radio");
   assert.ok(radios.length >= 30, `Expected at least 30 verified radios, got ${radios.length}`);
@@ -91,29 +91,41 @@ test("Radio integrity: Clean audio stations only (no Italian visual TV streams) 
     assert.ok(!/rds\s*social|radiokisskiss\.tv|deejay\.it\/tv/i.test(r.title), `Visual TV stream leaked into Radio: ${r.title}`);
     const logo = r.logo_url || r.poster_url;
     assert.ok(logo && logo.startsWith("/assets/radio-logos/"), `Radio ${r.title} must use local radio logo, got ${logo}`);
+    assert.ok(!/radyo-d\.svg|world-radio\.svg/i.test(logo), `Placeholder radio logo left in ${r.title}: ${logo}`);
     const absPath = path.join(process.cwd(), "public", logo.replace(/^\//, ""));
     assert.ok(fs.existsSync(absPath), `Radio logo missing on disk: ${absPath}`);
+    assert.ok(fs.statSync(absPath).size > 200, `Radio logo too small: ${absPath}`);
   }
 });
 
-test("Home rows integrity: Clean 6 digital platform titles without unwanted suffix words", () => {
+test("Home rows integrity: Clean 6 digital platform titles without unwanted suffix words or extra channel rows", () => {
   const store = loadStore();
   const rowTitles = store.home_rows.map((r) => r.title);
   for (const expected of ["Netflix", "HBO Max", "Tabii TV", "BluTV", "Disney+", "Gain"]) {
     assert.ok(rowTitles.includes(expected), `Expected exact home row title "${expected}", got ${JSON.stringify(rowTitles)}`);
   }
-  const forbiddenRe = /başyapıtlar|orijinal yapımlar|orijinal dizileri|paralı yayınlar/i;
+  const forbiddenRe = /başyapıtlar|orijinal yapımlar|orijinal dizileri|paralı yayınlar|^haber kanalları$|^spor kanalları$|^çocuk kanalları$/i;
   for (const title of rowTitles) {
-    assert.ok(!forbiddenRe.test(title), `Forbidden label phrase found in home row title: ${title}`);
+    assert.ok(!forbiddenRe.test(title), `Forbidden home row title found: ${title}`);
   }
 });
 
-test("Turkish Channel Logos: Top national channels resolve to local verified SVGs on disk", async () => {
+test("Channel Logos: Turkish & Global EPG channels resolve to verified local images and foreign imgur/wikimedia logos remain intact", async () => {
   const { getChannelLogo } = await import("./turkishChannelLogos");
-  for (const name of ["TRT 1 HD", "ATV", "Kanal D", "Star TV", "Show TV", "Beyaz TV", "TV8", "NOW TV", "Kanal 7", "FOX TV"]) {
+  for (const name of [
+    "TRT 1 HD", "ATV", "Kanal D", "Star TV", "Show TV", "Beyaz TV", "TV8", "NOW TV", "Kanal 7", "FOX TV",
+    "TRT Haber", "TRT Belgesel", "TRT Spor", "A Spor", "NTV", "Halk TV", "HABER TURK", "CNN Türk", "BBC News", "CNN International", "Euronews",
+  ]) {
     const logo = getChannelLogo(name);
-    assert.ok(logo && logo.startsWith("/assets/channel-logos/"), `Expected local SVG logo for ${name}, got ${logo}`);
+    assert.ok(logo && logo.startsWith("/assets/channel-logos/"), `Expected local image logo for ${name}, got ${logo}`);
     const absPath = path.join(process.cwd(), "public", logo.replace(/^\//, ""));
-    assert.ok(fs.existsSync(absPath), `Channel logo SVG missing on disk: ${absPath}`);
+    assert.ok(fs.existsSync(absPath), `Channel logo missing on disk: ${absPath}`);
+    const stat = fs.statSync(absPath);
+    assert.ok(stat.size > 300 && stat.size !== 34641, `Channel logo corrupt/placeholder (${stat.size}B): ${absPath}`);
   }
+  assert.equal(getChannelLogo("Star Trek: The Next Generation", null, true), null);
+  assert.equal(getChannelLogo("NOW 70s", null, true), null);
+  assert.equal(getChannelLogo("ATV+ Noticias", null, true), null);
+  assert.equal(getChannelLogo("Unknown Global Channel", "https://i.imgur.com/example.png", true), null);
+  assert.equal(getChannelLogo("Unknown Global Channel", "https://upload.wikimedia.org/example.png", true), "https://upload.wikimedia.org/example.png");
 });

@@ -45,7 +45,7 @@ export type UserStream = {
 // Relaxed URL: accept any https(s) URL. Stream type is auto-detected.
 const urlSchema = z.string().trim().url().max(2000);
 
-const CATEGORY_ENUM = z.enum(["Live TV", "Series", "Movies", "Radio"]);
+const CATEGORY_ENUM = z.enum(["Live TV", "Series", "Movies", "Radio", "TV Programs"]);
 
 const saveSchema = z.object({
   title: z.string().trim().min(2).max(120),

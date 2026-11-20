@@ -4,6 +4,7 @@ import { streamToMedia } from "./AdminSources";
 import type { HomeRowWithItems } from "@/lib/home-layout.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { recordCategoryClick } from "@/lib/engagement.functions";
+import { getChannelLogo } from "@/lib/turkishChannelLogos";
 
 type Props = {
   rows: HomeRowWithItems[];
@@ -44,6 +45,7 @@ export function HomeRows({ rows, focusedKey, registerRef, onPlay }: Props) {
                 const m = streamToMedia(s);
                 if (row.display === "channel") {
                   const isFocus = focusedKey === fk;
+                  const logoSrc = getChannelLogo(s.title, s.logoUrl || s.posterUrl, s.isForeign);
                   return (
                     <button
                       key={s.id}
@@ -51,23 +53,29 @@ export function HomeRows({ rows, focusedKey, registerRef, onPlay }: Props) {
                       data-focus-key={fk}
                       tabIndex={-1}
                       onClick={() => handlePick(m, row, s.category)}
-                      className={`flex aspect-[4/3] w-[150px] flex-shrink-0 flex-col items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-3 outline-none transition active:scale-95 md:w-[170px] ${
+                      className={`flex aspect-[4/3] w-[150px] flex-shrink-0 flex-col items-center justify-between gap-2 rounded-2xl border border-white/10 bg-white/5 p-3 outline-none transition active:scale-95 md:w-[170px] ${
                         isFocus ? "neon-ring scale-105 bg-purple-600/20" : "hover:bg-white/10"
                       }`}
                     >
-                      <div className="relative flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-fuchsia-700 text-2xl font-black text-white">
-                        <span>{s.title.slice(0, 1).toUpperCase()}</span>
-                        {(s.logoUrl || s.posterUrl) && (
-                          <img
-                            loading="lazy"
-                            src={s.logoUrl || s.posterUrl}
-                            alt={s.title}
-                            onError={(e) => {
-                              e.currentTarget.style.display = "none";
-                            }}
-                            className="absolute inset-0 h-14 w-14 rounded-xl bg-black/80 p-1 object-contain"
-                          />
-                        )}
+                      {logoSrc ? (
+                        <img
+                          loading="lazy"
+                          src={logoSrc}
+                          alt={s.title}
+                          onError={(e) => {
+                            const img = e.currentTarget;
+                            img.style.display = "none";
+                            const fb = img.nextElementSibling as HTMLElement | null;
+                            if (fb) fb.style.display = "flex";
+                          }}
+                          className="h-full max-h-[64%] w-full flex-1 object-contain"
+                        />
+                      ) : null}
+                      <div
+                        style={{ display: logoSrc ? "none" : "flex" }}
+                        className="h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-fuchsia-700 text-2xl font-black text-white"
+                      >
+                        {s.title.slice(0, 1).toUpperCase()}
                       </div>
                       <div className="line-clamp-1 text-sm font-black text-white">{s.title}</div>
                       <span className="rounded-full bg-red-600/80 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-white">

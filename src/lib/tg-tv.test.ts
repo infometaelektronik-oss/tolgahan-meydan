@@ -25,9 +25,10 @@ test("Poster integrity: All Series & Movies resolve to valid local posters on di
     const resolved = getContentPoster(item.id, item.title);
     assert.ok(resolved, `Missing poster mapping for ${item.id} (${item.title})`);
     assert.ok(
-      resolved.poster.startsWith("/assets/posters/"),
-      `Expected local poster asset for ${item.id}, got ${resolved.poster}`
+      resolved.poster.startsWith("/assets/posters/") && resolved.poster.endsWith(".jpg"),
+      `Expected local .jpg poster asset for ${item.id}, got ${resolved.poster}`
     );
+    assert.equal(item.poster_url, resolved.poster, `DB poster_url for ${item.id} must match verified .jpg poster`);
 
     const resolvedCustom = getContentPoster(`custom-${item.id}`, item.title);
     assert.equal(resolvedCustom?.poster, resolved.poster, `custom- prefix must resolve identically for ${item.id}`);
@@ -35,7 +36,7 @@ test("Poster integrity: All Series & Movies resolve to valid local posters on di
     const absPath = path.join(process.cwd(), "public", resolved.poster.replace(/^\//, ""));
     assert.ok(fs.existsSync(absPath), `Poster file missing on disk: ${absPath}`);
     const stat = fs.statSync(absPath);
-    assert.ok(stat.size > 300, `Poster file appears corrupt/too small (${stat.size}B): ${absPath}`);
+    assert.ok(stat.size > 1500, `Poster file appears corrupt/too small (${stat.size}B): ${absPath}`);
   }
 });
 
